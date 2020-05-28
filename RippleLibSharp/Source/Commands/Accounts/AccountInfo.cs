@@ -5,6 +5,7 @@ using RippleLibSharp.Result;
 using RippleLibSharp.Network;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Keys;
+using System.Threading;
 
 namespace RippleLibSharp.Commands.Accounts
 {
@@ -12,28 +13,33 @@ namespace RippleLibSharp.Commands.Accounts
 	{
 		
 
-		public static Task<Response<AccountInfoResult>> GetResult ( string account, NetworkInterface ni ) {
+		public static Task<Response<AccountInfoResult>> GetResult ( string account, NetworkInterface ni, CancellationToken token, IdentifierTag identifierTag = null ) {
 
-			int id = NetworkRequestTask.ObtainTicket();
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
+
 			object o = new {
-				id,
+				id = identifierTag,
 				command = "account_info",
 				account
 			};
 
 			string request = DynamicJson.Serialize (o);
 
-			Task<Response<AccountInfoResult>> task = NetworkRequestTask.RequestResponse <AccountInfoResult> (id, request, ni);
+			Task<Response<AccountInfoResult>> task = NetworkRequestTask.RequestResponse <AccountInfoResult> (identifierTag, request, ni, token);
 
 			//task.Wait ();
 			//return task.Result;
 			return task;
 		}
 
-		public static UInt32? GetSequence (string account, NetworkInterface ni ) {
-			Task<Response<AccountInfoResult>> t = GetResult (account, ni);
+		public static UInt32? GetSequence (string account, NetworkInterface ni, CancellationToken token ) {
+			Task<Response<AccountInfoResult>> t = GetResult (account, ni, token);
 
-			t.Wait ();
+			t.Wait (token);
 
 			Response<AccountInfoResult> res = t?.Result;
 
@@ -55,12 +61,13 @@ namespace RippleLibSharp.Commands.Accounts
 		}
 
 
-		public static RippleCurrency GetNativeBalance (RippleAddress ra, NetworkInterface ni ) {
+		public static RippleCurrency GetNativeBalance (RippleAddress ra, NetworkInterface ni, CancellationToken token ) {
 
 
 			Task<Response<AccountInfoResult>> task = AccountInfo.GetResult (
 				ra,
-				ni
+				ni,
+				token
 
 			);
 

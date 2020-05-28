@@ -4,11 +4,17 @@ using RippleLibSharp.Keys;
 using RippleLibSharp.Util;
 using RippleLibSharp.Binary;
 using RippleLibSharp.Network;
+using System.Text;
 
 namespace RippleLibSharp.Transactions.TxTypes
 {
 	public class RippleOfferTransaction : RippleTransaction
 	{
+		public RippleOfferTransaction ()
+		{
+
+		}
+
 		public RippleOfferTransaction (RippleAddress account, Offer off) 
 		{
 			
@@ -16,10 +22,12 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 
 		public void SetOffer(RippleAddress account, Offer off) {
-			this.TakerPays = off.TakerPays;
-			this.TakerGets = off.TakerGets;
+			this.TakerPays = off.TakerPays.DeepCopy();
+			this.TakerGets = off.TakerGets.DeepCopy();
 
 			this.Account = account;
+
+			this.Memos = off.Memos;
 		}
 
 		public RippleOfferTransaction (RippleBinaryObject serObj)
@@ -35,7 +43,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 			Sequence = (UInt32)serObj.GetField (BinaryFieldType.Sequence);
 
-			 
+			Memos = (MemoIndice[])serObj.GetField (BinaryFieldType.Memos);  // This might be a tough cookie to keep type safety
 
 			fee = (RippleCurrency)serObj.GetField (BinaryFieldType.Fee);
 
@@ -84,17 +92,41 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 
 		public override string GetJsonTx () {
-			string s = "'{\"TransactionType\": \"OfferCreate\"," + 
-				"\"Account\": \"" + Account + "\"," + 
-				"\"Fee\": " + fee.ToJsonString() + "," + 
-				"\"Flags\": " + flags.ToString() + "," + 
-				"\"LastLedgerSequence\": " + this.LastLedgerSequence.ToString() + "," +
-				"\"Sequence\": " + Sequence.ToString() + "," + 
-				"\"TakerGets\": " + TakerGets.ToJsonString() + "," + 
-				"\"TakerPays\": " + TakerPays.ToJsonString() + "" +
-				"}'";
 
-			return s;
+
+			StringBuilder stringBuilder = new StringBuilder ();
+			stringBuilder.Append("'");
+			stringBuilder.Append (GetJsonTxDotNet());
+			stringBuilder.Append ("'");
+
+			return stringBuilder.ToString();
+		}
+
+		public override string GetJsonTxDotNet ()
+		{
+			StringBuilder stringBuilder = new StringBuilder ();
+			stringBuilder.Append ("{\"TransactionType\": \"OfferCreate\",");
+			stringBuilder.Append ("\"Account\": \"" + Account + "\",");
+			stringBuilder.Append ("\"Fee\": " + fee.ToJsonString () + ",");
+			stringBuilder.Append ("\"Flags\": " + flags.ToString () + ",");
+
+			if (LastLedgerSequence != 0) {
+				stringBuilder.Append ("\"LastLedgerSequence\": " + this.LastLedgerSequence.ToString () + ",");
+			}
+			stringBuilder.Append ("\"Sequence\": " + Sequence.ToString () + ",");
+
+			if (this.Memos != null) {
+				stringBuilder.Append ("\"Memos\": " + DynamicJson.Serialize (this.Memos) + ",");
+			}
+
+			stringBuilder.Append ("\"TakerGets\": " + TakerGets.ToJsonString () + ",");
+			stringBuilder.Append ("\"TakerPays\": " + TakerPays.ToJsonString () + "");
+
+			stringBuilder.Append ("}");
+
+
+
+			return stringBuilder.ToString ();
 		}
 
 		/*
@@ -148,7 +180,17 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 	*/
 
+		public override string ToString ()
+		{
+			StringBuilder stringBuilder = new StringBuilder ();
 
+			stringBuilder.Append ("Sell ");
+			stringBuilder.Append (TakerGets.ToString());
+			stringBuilder.Append (" for ");
+			stringBuilder.Append (TakerPays.ToString());
+
+			return stringBuilder.ToString ();
+		}
 
 
 	}

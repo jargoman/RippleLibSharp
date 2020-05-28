@@ -1,16 +1,15 @@
-﻿using System;
-using Codeplex.Data;
+﻿using Codeplex.Data;
 using RippleLibSharp.Network;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Transactions.TxTypes;
 
 namespace RippleLibSharp.Network
 {
-	public class PingObject
+	public class PingObject : Identifiable
 	{
 
 #pragma warning disable IDE1006 // Naming Styles
-		public int id { get; set; }
+		public IdentifierTag id { get; set; }
 
 
 		public string status { get; set; }
@@ -18,7 +17,7 @@ namespace RippleLibSharp.Network
 		public string type { get; set; }
 
 		public string error { get; set; }
-		public int error_code { get; set; }
+		public int? error_code { get; set; }
 		public string error_message { get; set; }
 
 #pragma warning restore IDE1006 // Naming Styles
@@ -73,8 +72,11 @@ namespace RippleLibSharp.Result
 
 			if (jsonResp.result != null) {
 				Json_Response resp = jsonResp.result;
-
-				result = DynamicJson.Parse (resp.json_text, System.Text.Encoding.Default);
+				if (resp.json_text != null) {
+					if (DynamicJson.CanParse (resp.json_text)) {
+						result = DynamicJson.Parse (resp.json_text, System.Text.Encoding.Default);
+					}
+				}
 			}
 
 			return this;
@@ -101,6 +103,13 @@ namespace RippleLibSharp.Result
 		}
 
 		public Json_Response (string s) {
+			if (s == null) {
+				return;
+			}
+
+			if (s == "{}") {
+				return;
+			}
 			json_text = s;
 		}
 

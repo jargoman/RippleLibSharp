@@ -1,28 +1,24 @@
 using System;
-using System.Security;
-
 using System.IO;
+using System.Text;
+using Org.BouncyCastle.Asn1.Sec;
+using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Crypto.Digests;
 //using System.Security.Cryptography;
 using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Crypto.Digests;
-using Org.BouncyCastle.Asn1.X9;
-using Org.BouncyCastle.Asn1.Sec;
-using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Utilities;
-
+using Org.BouncyCastle.Math.EC;
 using RippleLibSharp.Binary;
 using RippleLibSharp.Util;
-using System.Text;
 
 namespace RippleLibSharp.Keys
 {
 	public class RippleDeterministicKeyGenerator
 	{
-		public static ECDomainParameters SECP256k1_PARAMS;
+		public ECDomainParameters SECP256k1_PARAMS;
 		protected byte [] seedBytes;
 
-		static RippleDeterministicKeyGenerator (/*String stringID*/) // STATIC constructor
+		public RippleDeterministicKeyGenerator () 
 		{
 #if DEBUG
 			string method_sig = clsstr + nameof (RippleDeterministicKeyGenerator) + DebugRippleLibSharp.both_parentheses;
@@ -35,7 +31,14 @@ namespace RippleLibSharp.Keys
 			string curveName = "secp256k1";
 
 			X9ECParameters paramater = SecNamedCurves.GetByName (curveName);
-			SECP256k1_PARAMS = new ECDomainParameters (paramater.Curve, paramater.G, paramater.N, paramater.H);
+			//paramater.c
+			SECP256k1_PARAMS = new ECDomainParameters (
+				paramater.Curve, 
+				paramater.G, 
+				paramater.N, 
+				paramater.H, 
+				paramater.GetSeed()
+			);
 
 			/*
 			if (Debug.RippleDeterministicKeyGenerator) {
@@ -51,7 +54,7 @@ namespace RippleLibSharp.Keys
 
 		}
 
-		public RippleDeterministicKeyGenerator (byte [] bytesSeed)
+		public RippleDeterministicKeyGenerator (byte [] bytesSeed) : this ()
 		{
 			if (bytesSeed.Length != 16) {
 				throw new FormatException ("The seed size should be 128 bit, was " + bytesSeed.Length * 8);
@@ -111,13 +114,22 @@ namespace RippleLibSharp.Keys
 			return ret32; // return ret32 not result
 		}
 
+		public override string ToString ()
+		{
+			byte [] bites = GetPrivateRootKeyBytes ();
+
+			return Base58.ByteArrayToHexString (bites);
+
+		}
+
 
 		public byte [] GetPrivateRootKeyBytes ()
 		{
 
 			// TODO portable? endianess? testing?
 			for (int seq = 0; ; seq++) {
-				MemoryStream mem = new MemoryStream (4);
+				MemoryStream mem = new MemoryStream (seedBytes.Length + 4);
+				//MemoryStream mem = new MemoryStream (4);
 
 				BigEndianWriter bew = new BigEndianWriter (mem);
 
@@ -128,7 +140,7 @@ namespace RippleLibSharp.Keys
 				bew.Flush ();
 
 				mem.Flush ();
-
+				
 				byte [] seedAndSeqBytes = mem.ToArray ();
 
 				if (seedAndSeqBytes.Length != seedBytes.Length + 4) {
@@ -148,13 +160,17 @@ namespace RippleLibSharp.Keys
 		public ECPoint GetPublicGeneratorPoint ()
 		{
 			byte [] privateGeneratorBytes = GetPrivateRootKeyBytes ();
-			ECPoint publicGenerator = new RipplePrivateKey (privateGeneratorBytes).GetPublicKey ().GetPublicPoint ();
+
+			RipplePrivateKey privateKey = new RipplePrivateKey (privateGeneratorBytes);
+			RipplePublicKey publicKey = privateKey.GetPublicKey ();
+			ECPoint publicGenerator = publicKey.GetPublicPoint ();
 			return publicGenerator;
 		}
 
 		public RipplePrivateKey GetAccountPrivateKey (int accountNumber)
 		{
-			BigInteger privateRootKeyBI = new BigInteger (1, GetPrivateRootKeyBytes ());
+			BigInteger privateRootKeyBI = new BigInteger ( 1, GetPrivateRootKeyBytes () );
+
 			// TODO factor out the common part with the public key
 
 			ECPoint publicGeneratorPoint = GetPublicGeneratorPoint ();
@@ -183,10 +199,11 @@ namespace RippleLibSharp.Keys
 				mem.Flush ();
 
 				byte [] pubGenAccountSubSeqBytes = mem.ToArray ();
-				byte [] publicGeneratorAccountSeqHashBytes = HalfSHA512 (pubGenAccountSubSeqBytes);
+				byte [] publicGeneratorAccountSeqHashBytes = HalfSHA512 ( pubGenAccountSubSeqBytes );
 
 				pubGenSeqSubSeqHashBI = new BigInteger (1, publicGeneratorAccountSeqHashBytes);
-				if (pubGenSeqSubSeqHashBI.CompareTo (SECP256k1_PARAMS.N) == -1 && !pubGenSeqSubSeqHashBI.Equals (BigInteger.Zero)) {
+				if (pubGenSeqSubSeqHashBI.CompareTo (SECP256k1_PARAMS.N) == -1 
+					&& !pubGenSeqSubSeqHashBI.Equals (BigInteger.Zero)) {
 					break;
 				}
 
@@ -254,9 +271,26 @@ namespace RippleLibSharp.Keys
 
 			Logging.WriteLog ("hex seed = " + masterseedhex.ToString () + "\n human seed = " + seed.ToString ());
 
-			RippleAddress privatekey = seed.GetPublicRippleAddress ();
+			//RippleAddress privatekey = seed.GetPublicRippleAddress ();
 
-			Logging.WriteLog ("seed shHM53KPZ87Gwdqarm1bAmPeXg8Tn becomes " + privatekey.ToString ());
+			RippleDeterministicKeyGenerator generator = new RippleDeterministicKeyGenerator (masterseedhex);
+
+			generator.ToString ();
+
+			RipplePrivateKey privateKey = generator.GetAccountPrivateKey (0);
+
+			Logging.WriteLog ( privateKey.GetHumanReadableIdentifier ());
+			Logging.WriteLog ( privateKey.ToString () );
+			
+			//RipplePrivateKey privateKey = seed.GetPrivateKey (0);
+
+			RipplePublicKey publicKey = privateKey.GetPublicKey ();
+
+			RippleAddress rippleAddress = publicKey.GetAddress ();
+
+			Logging.WriteLog ("seed shHM53KPZ87Gwdqarm1bAmPeXg8Tn becomes " + rippleAddress.ToString ());
+
+			Logging.WriteLog ("From string seed is " + seed2.GetPublicRippleAddress());
 
 			return true;
 		}

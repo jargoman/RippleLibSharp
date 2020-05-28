@@ -14,6 +14,12 @@ using RippleLibSharp.LocalRippled;
 
 using RippleLibSharp.Commands.Accounts;
 
+using Ripple.TxSigning;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using RippleLibSharp.Commands.Server;
+using System.Collections.Generic;
+
 namespace RippleLibSharp.Transactions.TxTypes
 {
 	public class RippleTransaction
@@ -62,13 +68,15 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 
 
-		public RippleMemo [] Memos {
+		public MemoIndice [] Memos {
 			get;
 			set;
 		}
 		public RippleCurrency fee {
 			get { return _fee; }
-			set { _fee = value; }
+			set {
+				
+				_fee = value; }
 		}
 
 		public RippleCurrency Fee {
@@ -77,9 +85,22 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 
 		private RippleCurrency _fee {
-			get;
-			set;
+			get { return _fee_;}
+			set {
+				if (!value.IsNative) {
+					throw new FormatException ("Fee must be native currenct " + RippleCurrency.NativeCurrency);
+				}
+
+				if (value.amount > MAXFEE) {
+					throw new FormatException ("Fee must be less than " + MAXFEE.ToString ());
+				}
+				_fee_ = value;
+			}
 		}
+
+		private const int MAXFEE = 2000000;
+
+		private RippleCurrency _fee_ = null;
 		public string ledger_index {
 			get;
 			set;
@@ -166,7 +187,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 			set;
 		}
 
-		public UInt32 DestinationTag {
+		public UInt32? DestinationTag {
 			get;
 			set;
 		}
@@ -235,6 +256,16 @@ namespace RippleLibSharp.Transactions.TxTypes
 			set;
 		}
 
+		public bool? signed {
+			get;
+			set;
+		}
+
+		public bool? submitted {
+			get;
+			set;
+		}
+
 		/*
 		public string PreviousTxnId {
 
@@ -254,6 +285,46 @@ namespace RippleLibSharp.Transactions.TxTypes
 		public virtual RippleBinaryObject GetBinaryObject ()
 		{
 			return null;
+		}
+
+		public string Sign (RippleIdentifier signingKey)
+		{
+			if (signingKey is RippleSeedAddress) {
+				return Sign ((RippleSeedAddress)signingKey);
+			}
+
+			if (signingKey is RipplePrivateKey) {
+				return Sign ((RipplePrivateKey)signingKey);
+			}
+
+			throw new NotImplementedException ("signing key type not supported");
+		}
+
+		public string Sign (RipplePrivateKey privateKey)
+		{
+			BinarySerializer bs = new BinarySerializer ();
+
+			RippleBinaryObject rbo = GetBinaryObject ();
+			rbo = rbo.GetObjectSorted ();
+
+
+
+			//RipplePrivateKey rpk = seed.GetPrivateKey (0);
+			RippleTxSigner rtxs = new RippleTxSigner (privateKey);
+
+			rbo = rtxs.Sign (rbo);
+
+			var v = bs.WriteBinaryObject (rbo);
+
+			byte [] signedTXBytes = v; // was to array
+
+			//RippleBinaryObject test = bs.readBinaryObject( new System.IO.MemoryStream (signedTXBytes));
+
+			String blob = Base58.ByteArrayToHexString (signedTXBytes);
+
+			this.SignedTransactionBlob = blob;
+
+			return blob;
 		}
 
 		public string Sign (RippleSeedAddress seed)
@@ -282,10 +353,12 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 			this.SignedTransactionBlob = blob;
 
+			signed = true;
+
 			return blob;
 		}
 
-		public string SignLocalRippled (RippleSeedAddress seed)
+		public string SignLocalRippled (RippleIdentifier seed)
 		{
 
 			string jsn = GetJsonTx ();
@@ -306,38 +379,75 @@ namespace RippleLibSharp.Transactions.TxTypes
 				return null;
 			}
 
-			Response<RippleSubmitTxResult> r = DynamicJson.Parse (output);
+			Response<RippleSubmitTxResult> response = DynamicJson.Parse (output);
+			if (response == null) {
+				return null;
+			}
+			if (response.HasError ()) {
 
-			if (r.error != null) {
-
-				Logging.WriteLog (r.error_message);
+				Logging.WriteLog (response?.error_message ?? "error");
 				return null;
 			}
 
-			this.SignedTransactionBlob = r.result.tx_blob;
-			this.hash = r.result.tx_json.hash;
+
+			this.SignedTransactionBlob = response.result.tx_blob;
+			this.hash = response?.result?.tx_json?.hash;
 
 			Logging.WriteLog ("blob = " + this.SignedTransactionBlob);
+
+			signed = true;
 
 			return this.SignedTransactionBlob;
 
 		}
 
+		public string SignRippleDotNet (RippleIdentifier seed)
+		{
+
+
+			string jsn =  GetJsonTxDotNet ();
+
+			if (seed == null) {
+				throw new ArgumentNullException ();
+			}
+
+
+			//string test = "{\"test\":\"test\"}";
+			var o  = JObject.Parse (jsn);
+			
+			SignedTx signedtx = TxSigner.SignJson (o, seed.GetHumanReadableIdentifier ());
+
+			this.SignedTransactionBlob = signedtx?.TxBlob;
+			this.hash = signedtx?.Hash;
+
+			signed = true;
+
+			return this.SignedTransactionBlob;
+		}
+
+
 		public virtual string GetJsonTx ()
 		{
+			return null;
+		}
+	
+
+		public virtual string GetJsonTxDotNet () {
 			return null;
 		}
 
 
 
-		public UInt32 AutoRequestFee (NetworkInterface ni)
+
+		public void AutoRequestFee (NetworkInterface ni, CancellationToken token)
 		{
-			Tuple<string, UInt32> tupe = RippleLibSharp.Commands.Server.ServerInfo.GetFeeAndLedgerSequence (ni);
-			fee = tupe.Item1;
-			return tupe.Item2;
+
+			FeeAndLastLedgerResponse resp = ServerInfo.GetFeeAndLedgerSequence (ni, token);
+			fee = resp.Fee;
+			//return resp.Fee;
 		}
 
-		public uint AutoRequestSequence (RippleAddress rw, NetworkInterface ni)
+		public uint AutoRequestSequence (RippleAddress rw, NetworkInterface ni, CancellationToken token)
 		{
 			if (rw == null) {
 				Sequence = 0;
@@ -349,13 +459,14 @@ namespace RippleLibSharp.Transactions.TxTypes
 				Sequence = 0;
 				return 0;
 			}
-			Sequence = AccountInfo.GetSequence (rw?.ToString (), ni) ?? 0;
 
+			Sequence = AccountInfo.GetSequence (rw?.ToString (), ni, token) ?? 0;
+			 
 			return Sequence;
 		}
 
 
-		protected Response<T> SubmitToNetwork<T> (NetworkInterface ni)
+		protected Response<T> SubmitToNetwork<T> (NetworkInterface ni, CancellationToken token, IdentifierTag identifierTag = null)
 		{
 
 			if (this.SignedTransactionBlob == null) {
@@ -363,10 +474,16 @@ namespace RippleLibSharp.Transactions.TxTypes
 				return null;
 			}
 
-			int ticket = NetworkRequestTask.ObtainTicket ();
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
+
+			//int ticket = NetworkRequestTask.ObtainTicket ();
 
 			object ob = new {
-				id = ticket,
+				id = identifierTag,
 				command = "submit",
 				tx_blob = this.SignedTransactionBlob
 			};
@@ -387,9 +504,9 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 
 
-			var tsk = NetworkRequestTask.RequestResponse<T> (ticket, json, ni);
+			var tsk = NetworkRequestTask.RequestResponse<T> (identifierTag, json, ni, token);
 
-			tsk.Wait ();
+			tsk.Wait (token);
 
 
 
@@ -401,10 +518,10 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 
 
-		public Response<RippleSubmitTxResult> Submit (NetworkInterface ni)
+		public Response<RippleSubmitTxResult> Submit (NetworkInterface ni, CancellationToken token)
 		{
 
-			return this.SubmitToNetwork<RippleSubmitTxResult> (ni);
+			return this.SubmitToNetwork<RippleSubmitTxResult> (ni, token);
 
 
 
@@ -435,6 +552,23 @@ namespace RippleLibSharp.Transactions.TxTypes
 			return s;
 		}
 
+
+
+		public void AddMemo (MemoIndice memoIndice)
+		{
+
+			if (memoIndice == null) {
+				return;
+			}
+			List<MemoIndice> memos = new List<MemoIndice> ();
+			if (this.Memos != null) {
+				memos.AddRange (this.Memos);
+			}
+
+
+			memos.Add (memoIndice);
+			this.Memos = memos.ToArray ();
+		}
 
 
 #if DEBUG

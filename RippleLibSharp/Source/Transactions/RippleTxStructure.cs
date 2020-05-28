@@ -121,7 +121,7 @@ namespace RippleLibSharp.Transactions
 				}
 #endif
 
-				return GetRippleOfferCanselTransaction (queried_addr);
+				return GetRippleOfferCancelTransaction (queried_addr);
 			}
 
 			if (tx.TransactionType == RippleTransactionType.ACCOUNT_SET) {
@@ -227,8 +227,8 @@ namespace RippleLibSharp.Transactions
 #if DEBUG
 			if (DebugRippleLibSharp.RippleTxStructure) {
 				Logging.WriteLog (builder.ToString ());
-				LinkedList<OrderChange> cl = this.meta.GetOrderChanges (queried_addr);
-				Logging.WriteLog ("cl.Count = " + cl.Count);
+				IEnumerable<OrderChange> cl = this.meta.GetOrderChanges (queried_addr);
+				Logging.WriteLog ("cl.Count = " + cl.Count());
 				foreach (OrderChange d in cl) {
 					Logging.WriteLog (d.BuyOrderChange);
 				}
@@ -239,10 +239,14 @@ namespace RippleLibSharp.Transactions
 			return new Tuple<string, string> (s, s);
 		}
 
-		private Tuple<string, string> GetRippleOfferCanselTransaction (RippleAddress queried_addr)
+		private Tuple<string, string> GetRippleOfferCancelTransaction (RippleAddress queried_addr)
 		{
+
 #if DEBUG
-			string method_sig = clsstr + nameof (GetRippleOfferCanselTransaction) + DebugRippleLibSharp.left_parentheses + nameof (RippleAddress) + DebugRippleLibSharp.space_char + nameof (queried_addr) + DebugRippleLibSharp.equals + DebugRippleLibSharp.ToAssertString (queried_addr) + DebugRippleLibSharp.right_parentheses;
+			string method_sig = 
+				clsstr + 
+				nameof (GetRippleOfferCancelTransaction) + 
+				DebugRippleLibSharp.left_parentheses + nameof(RippleAddress) + DebugRippleLibSharp.space_char + nameof(queried_addr) + DebugRippleLibSharp.equals + DebugRippleLibSharp.ToAssertString (queried_addr) + DebugRippleLibSharp.right_parentheses;
 			if (DebugRippleLibSharp.RippleTxStructure) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
@@ -258,42 +262,50 @@ namespace RippleLibSharp.Transactions
 				acnt = TextHighlighter.Highlight (acnt); //highlight (acnt);
 			}
 
+			RippleNode canceledOrderNode = null;
 
-			/*
-			foreach (RippleNodeGroup v in meta.AffectedNodes) {
+			if (!Configuration.Config.PreferLinq) {
 
-			}
-			*/
+				foreach (RippleNodeGroup rng in meta.AffectedNodes) {
+					if ("Offer".Equals (rng?.GetNode ()?.LedgerEntryType)) {
+						canceledOrderNode = rng.GetNode();
+						break;
 
-			var va = from RippleNodeGroup rng in meta.AffectedNodes
-					 where
-							 "Offer".Equals (rng?.GetNode ()?.LedgerEntryType)
+					}
+				}
+				
+			} else {
+
+				var va = from RippleNodeGroup rng in meta.AffectedNodes
+					where "Offer".Equals (rng?.GetNode ()?.LedgerEntryType)
 					 select rng.GetNode ();
 
+				try {
+					canceledOrderNode = va.First ();
 
-			RippleNode canseledOrderNode = null;
-			try {
-				canseledOrderNode = va.First ();
-
-			} catch (Exception e) {
+				} catch (Exception e) {
 #if DEBUG
-				if (DebugRippleLibSharp.RippleTxStructure) {
-					Logging.ReportException (method_sig, e);
-				}
+					if (DebugRippleLibSharp.RippleTxStructure) {
+						Logging.ReportException (method_sig, e);
+					}
 #endif
+
+				}
+
+
 
 			}
 
-			if (canseledOrderNode != null) {
-				tGets = canseledOrderNode.FinalFields.TakerGets;
-				tPays = canseledOrderNode.FinalFields.TakerPays;
+			if (canceledOrderNode != null) {
+				tGets = canceledOrderNode.FinalFields.TakerGets;
+				tPays = canceledOrderNode.FinalFields.TakerPays;
 			}
 
 
 			builder.Append (acnt);
-			builder.Append (" canseled an order");
+			builder.Append (" canceled an order");
 
-			if (canseledOrderNode != null) {
+			if (canceledOrderNode != null) {
 
 				builder.Append (" to buy ");
 				builder.Append (tPays?.ToString () ?? "null");
@@ -307,9 +319,9 @@ namespace RippleLibSharp.Transactions
 			builder.Clear ();
 
 			builder.Append (acnt);
-			builder.Append (" canseled an order");
+			builder.Append (" canceled an order");
 
-			if (canseledOrderNode != null) {
+			if (canceledOrderNode != null) {
 				builder.Append (" to sell ");
 				builder.Append (tGets?.ToString () ?? "null");
 				builder.Append (" for ");
@@ -398,6 +410,9 @@ namespace RippleLibSharp.Transactions
 			RippleCurrency tgets = tx.TakerGets;
 			RippleCurrency tpays = tx.TakerPays;
 
+			Decimal cost = tgets.GetNativeAdjustedCostAt (tpays);
+			Decimal price = tpays.GetNativeAdjustedPriceAt (tgets);
+
 
 			if (queried_addr == tx.Account) {
 				TextHighlighter.Highlightcolor = TextHighlighter.RED;
@@ -410,12 +425,18 @@ namespace RippleLibSharp.Transactions
 			buybuilder.Append (" for ");
 			buybuilder.Append (tgets.ToString ());
 
+			buybuilder.Append (" Price : ");
+			buybuilder.Append (price.ToString ());
+
 
 			sellbuilder.Append (account);
 			sellbuilder.Append (" created an offer to sell ");
 			sellbuilder.Append (tgets.ToString ());
 			sellbuilder.Append (" for ");
 			sellbuilder.Append (tpays.ToString ());
+
+			sellbuilder.Append (" Cost : ");
+			sellbuilder.Append (cost.ToString ());
 
 			sellbuilder.Append ("ledger #" + tx.ledger_index);
 
@@ -430,7 +451,7 @@ namespace RippleLibSharp.Transactions
 				Logging.WriteLog (buybuilder.ToString ());
 				Logging.WriteLog (sellbuilder.ToString ());
 
-				LinkedList<OrderChange> cl = this.meta.GetOrderChanges (queried_addr);
+				IEnumerable<OrderChange> cl = this.meta.GetOrderChanges (queried_addr);
 				foreach (OrderChange d in cl) {
 					Logging.WriteLog (d.BuyOrderChange);
 				}

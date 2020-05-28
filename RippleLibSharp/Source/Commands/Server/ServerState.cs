@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Codeplex.Data;
 using RippleLibSharp.Network;
@@ -10,17 +11,22 @@ namespace RippleLibSharp.Commands.Server
 	{
 		
 
-		public static  Task<Response<ServerStateResult>> GetResult (NetworkInterface ni) {
+		public static  Task<Response<ServerStateResult>> GetResult (NetworkInterface ni, CancellationToken token, IdentifierTag identifierTag = null) {
 
-			int id = NetworkRequestTask.ObtainTicket();
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
+
 			object o = new {
-				id,
+				id = identifierTag,
 				command = "server_state",
 			};
 
 			string request = DynamicJson.Serialize (o);
 
-			Task< Response<ServerStateResult>> task = NetworkRequestTask.RequestResponse <ServerStateResult> (id, request, ni);
+			Task< Response<ServerStateResult>> task = NetworkRequestTask.RequestResponse <ServerStateResult> (identifierTag, request, ni, token);
 
 			//task.Wait ();
 

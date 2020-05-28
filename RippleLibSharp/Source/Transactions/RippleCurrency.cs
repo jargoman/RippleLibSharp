@@ -1,6 +1,7 @@
 using System;
 using System.Dynamic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Codeplex.Data;
 using RippleLibSharp.Commands.Accounts;
@@ -22,7 +23,21 @@ namespace RippleLibSharp.Transactions
 					return /*_amount*/ Math.Round (_amount);
 				}
 
-				return /*_amount*/Math.Round (_amount, 15);
+				if (_amount == default (decimal)) {
+					return default (decimal);
+				}
+
+				string amt = _amount.ToString ();
+				if (amt.Contains (".") && amt.Length > 15) {
+					amt = amt.Substring (0, 15);
+					
+
+				}
+				decimal? deci = RippleCurrency.ParseDecimal (amt);
+				if (deci != null) {
+					_amount = (decimal)deci;
+				}
+				return _amount;//Math.Round (_amount, 15);
 
 				//return _amount; 
 			}
@@ -32,10 +47,7 @@ namespace RippleLibSharp.Transactions
 
 
 
-		private Decimal _amount {
-			get;
-			set;
-		}
+		private Decimal _amount = default (decimal);
 
 
 		//public RippleAddress issuer = null;
@@ -68,10 +80,23 @@ namespace RippleLibSharp.Transactions
 					}
 
 
+				} else if (value is int) {
+
 				}
 			}
 
 		}
+
+
+
+		/* for use only with "get balance as currencies */
+		public string SelfLimit {
+			get;
+			set;
+
+		}
+
+
 #pragma warning restore IDE1006 // Naming Styles
 		public static readonly int MIN_SCALE = -96;
 		public static readonly int MAX_SCALE = 80;
@@ -1074,25 +1099,33 @@ namespace RippleLibSharp.Transactions
 			return rc;
 		}
 
-
+		private CancellationTokenSource tokenSource = null;
 		public void UpdateBalance (string account, NetworkInterface networkInterface)
 		{
+
+			//if (tokenSource != null) {
+			//	tokenSource.Cancel();
+			//}
+			tokenSource = new CancellationTokenSource ();
 
 			// How it's mother f'n done. 
 			if (this.IsNative) {
 
-				Task<Response<AccountInfoResult>> task = AccountInfo.GetResult (account, networkInterface);
-				task.Wait ();
+				Task<Response<AccountInfoResult>> task = AccountInfo.GetResult (account, networkInterface, tokenSource.Token);
+				task.Wait (tokenSource.Token);
 				Response<AccountInfoResult> response = task.Result;
 				AccountInfoResult accountInfoResult = response.result;
 				this.amount = accountInfoResult.GetNativeBalance ().amount;
 			} else {
-				RippleCurrency balance = AccountLines.GetBalanceForIssuer (this.currency, this.issuer, account, networkInterface);
+				RippleCurrency balance = AccountLines.GetBalanceForIssuer (this.currency, this.issuer, account, networkInterface, tokenSource.Token);
 				this.amount = balance.amount;
 			}
 
 
 		}
+
+
+
 
 		// gets the amount of native rather than pips. 
 		/*

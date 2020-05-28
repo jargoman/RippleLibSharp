@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace RippleLibSharp.Util
 {
@@ -12,8 +13,50 @@ namespace RippleLibSharp.Util
 
 		public static string Highlight (string s)
 		{
-			return "<span foreground=" + Highlightcolor + ">" + s + "</span>";
+			string str = null;
+			lock (lockObj) {
+				
+				StringBuilder stringBuilder = _stringBuilder;
+				stringBuilder.Clear ();
+
+				stringBuilder.Append ("<span foreground = ");
+				stringBuilder.Append (Highlightcolor);
+				stringBuilder.Append (">");
+				stringBuilder.Append (s);
+				stringBuilder.Append ("</span>");
+
+				str = stringBuilder.ToString ();
+				stringBuilder.Clear ();
+			}
+
+
+
+			return  str;
 		}
+
+		public static string Highlight (StringBuilder s)
+		{
+			string str = null;
+			lock (lockObj) {
+
+				StringBuilder stringBuilder = _stringBuilder;
+				stringBuilder.Clear ();
+
+				stringBuilder.Append ("<span foreground = ");
+				stringBuilder.Append (Highlightcolor);
+				stringBuilder.Append (">");
+				stringBuilder.Append (s.ToString ());
+				stringBuilder.Append ("</span>");
+
+				str = stringBuilder.ToString ();
+				stringBuilder.Clear ();
+			}
+
+
+
+			return str;
+		}
+
 
 
 
@@ -22,13 +65,20 @@ namespace RippleLibSharp.Util
 			set;
 		}
 
-
+		public static string BLACK = "\"black\"";
 		public static string RED = "\"red\"";
+		public static string LIGHT_RED = "\"#FFAABB\"";
 		public static string BLUE = "\"blue\"";
 		public static string GREEN = "\"green\"";
 		public static string YELLOW = "\"yellow\"";
 		public static string PURPLE = "\"purple\"";
-		public string ORANGE = "\"orange\"";
+		//public static string ORANGE = "\"orange\"";
+		public static string ORANGE = "\"orange\"";
+		public static string CHARTREUSE = "\"chartreuse\"";
+
+		private static object lockObj = new object ();
+		private static StringBuilder _stringBuilder = new StringBuilder();
+
 
 #if DEBUG
 		private const string clsstr = nameof (TextHighlighter) + DebugRippleLibSharp.colon;

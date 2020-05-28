@@ -40,7 +40,9 @@ namespace RippleLibSharp.Keys
 
 
 
-		public RippleIdentifier (byte [] payloadBytes, byte identifierType)
+		public RippleIdentifier (
+			byte [] payloadBytes, 
+			byte identifierType)
 		{
 			this.PayloadBytes = payloadBytes;
 			this.identifierType = identifierType;
@@ -52,6 +54,7 @@ namespace RippleLibSharp.Keys
 
 		public RippleIdentifier (String humanreadable)
 		{
+
 #if DEBUG
 			if (DebugRippleLibSharp.RippleIdentifier) {
 				Logging.WriteLog("RippleIdentifier.const (string humanreadable = " + DebugRippleLibSharp.AssertAllowInsecure(humanreadable) + " );\n");
@@ -65,6 +68,7 @@ namespace RippleLibSharp.Keys
 			byte [] checksumArray = DoubleSha256 (stringIdBytes, 0, stringIdBytes.Length - 4);
 
 #if DEBUG
+
 			if (DebugRippleLibSharp.RippleIdentifier) {
 				Logging.WriteLog(
 					"checksumArray = " +
@@ -79,6 +83,7 @@ namespace RippleLibSharp.Keys
 					stringIdBytes [stringIdBytes.Length - 1].ToString() + "\n"
 				);
 			}
+
 #endif
 
 			if (
@@ -136,7 +141,7 @@ namespace RippleLibSharp.Keys
 
 				string s = GetHumanReadableIdentifier ();
 				try {
-					RippleAddress rip = new RippleAddress (s);
+					RippleIdentifier rip = new RippleIdentifier (s);
 
 					if (!s.Equals (rip.GetHumanReadableIdentifier ())) {
 						throw new CryptographicException ();
@@ -262,7 +267,7 @@ namespace RippleLibSharp.Keys
 				return true;
 			}
 
-			if ((object)left == null || (object)right == null) {
+			if (left is null || right is null) {
 				return false;
 			}
 
@@ -273,6 +278,7 @@ namespace RippleLibSharp.Keys
 
 		public static bool operator != (RippleIdentifier left, RippleIdentifier right)
 		{
+			// Do not change to (left != right) 
 			return !(left == right);
 		}
 

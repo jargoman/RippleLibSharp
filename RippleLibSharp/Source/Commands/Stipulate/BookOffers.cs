@@ -6,22 +6,31 @@ using RippleLibSharp.Network;
 using RippleLibSharp.Result;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Keys;
+using System.Threading;
 
 namespace RippleLibSharp.Commands.Stipulate
 {
 	public static class BookOffers
 	{
-
+		
 		public static  Task<Response<BookOfferResult>> GetResult (
 			RippleCurrency taker_gets,
 			RippleCurrency taker_pays,
 			RippleAddress taker,
-			int?  limit,
-			NetworkInterface ni
+			uint?  limit,
+			NetworkInterface ni,
+			CancellationToken token,
+			IdentifierTag identifierTag = null
 		
 		) {
 
-			int id = NetworkRequestTask.ObtainTicket();
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
+
+			//int id = NetworkRequestTask.ObtainTicket();
 
 
 			string gts = DynamicJson.Serialize (taker_gets.GetAnonObjectWithoutAmount());
@@ -32,7 +41,7 @@ namespace RippleLibSharp.Commands.Stipulate
 
 			sb.Append ("{");
 			sb.Append ("\"id\": ");
-			sb.Append (id.ToString());
+			sb.Append (identifierTag.ToJsonString());
 			sb.Append (",");
 
 			sb.Append ("\"command\": \"book_offers\",");
@@ -66,7 +75,7 @@ namespace RippleLibSharp.Commands.Stipulate
 
 			string request = sb.ToString ();
 
-			Task< Response<BookOfferResult>> task = NetworkRequestTask.RequestResponse <BookOfferResult> (id, request, ni);
+			Task< Response<BookOfferResult>> task = NetworkRequestTask.RequestResponse <BookOfferResult> (identifierTag, request, ni, token);
 
 			//task.Wait ();
 
@@ -78,30 +87,35 @@ namespace RippleLibSharp.Commands.Stipulate
 			RippleCurrency taker_gets,
 			RippleCurrency taker_pays,
 			RippleAddress taker,
-			NetworkInterface ni
+			NetworkInterface ni,
+			CancellationToken token,
+			IdentifierTag identifierTag = null
 		) {
-			return GetResult (taker_gets, taker_pays, taker, null, ni);
+			return GetResult (taker_gets, taker_pays, taker, null, ni, token, identifierTag);
 		}
 
 		public static  Task<Response<BookOfferResult>> GetResult (
 			RippleCurrency taker_gets,
 			RippleCurrency taker_pays,
-			int? limit,
-			NetworkInterface ni
+			uint? limit,
+			NetworkInterface ni,
+			CancellationToken token,
+			IdentifierTag identifierTag = null
 		) {
-			return GetResult (taker_gets, taker_pays, null, limit, ni);
+			return GetResult (taker_gets, taker_pays, null, limit, ni, token, identifierTag);
 		}
 
 		public static  Task<Response<BookOfferResult>> GetResult (
 			RippleCurrency taker_gets,
 			RippleCurrency taker_pays,
-			NetworkInterface ni
+			NetworkInterface ni,
+			CancellationToken token,
+			IdentifierTag identifierTag = null
 		) {
-			return GetResult (taker_gets, taker_pays, null, null, ni);
+			return GetResult (taker_gets, taker_pays, null, null, ni, token, identifierTag);
 		}
 
 
-	
 	}
 }
 

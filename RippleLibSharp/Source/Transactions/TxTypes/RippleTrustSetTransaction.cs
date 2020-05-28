@@ -20,8 +20,10 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 		//UInt32 qualityIn = null;
 		//UInt32 qualityOut = null;
+		public RippleTrustSetTransaction ()
+		{
 
-
+		}
 
 		public RippleTrustSetTransaction (RippleTransaction tx)
 		{
@@ -156,6 +158,21 @@ namespace RippleLibSharp.Transactions.TxTypes
 			return rbo;
 		}
 
+		public override string GetJsonTxDotNet ()
+		{
+			string s = "{\"TransactionType\": \"TrustSet\"," +
+				"\"Account\": \"" + Account + "\"," +
+				"\"Fee\": " + fee.ToJsonString () + "," +
+				"\"Flags\": " + flags.ToString () + "," +
+				"\"LastLedgerSequence\": " + this.LastLedgerSequence.ToString () + "," +
+				"\"Sequence\": " + Sequence.ToString () + "," +
+				"\"LimitAmount\": " + LimitAmount.ToJsonString () + /*"," +*/
+										    /*"\"Destination\": \"" + this.Destination + "\"" +*/
+				"}";
+
+			return s;
+		}
+
 
 		public override string GetJsonTx ()
 		{
@@ -170,6 +187,20 @@ namespace RippleLibSharp.Transactions.TxTypes
 				"}'";
 
 			return s;
+		}
+
+		public override string ToString ()
+		{
+
+			StringBuilder stringBuilder = new StringBuilder ();
+			stringBuilder.Append ("Trust ");
+			stringBuilder.Append (LimitAmount.issuer ?? "null");
+			stringBuilder.Append (" for ");
+			stringBuilder.Append (LimitAmount.amount);
+			stringBuilder.Append (" ");
+			stringBuilder.Append (LimitAmount.currency);
+
+			return stringBuilder.ToString ();
 		}
 
 

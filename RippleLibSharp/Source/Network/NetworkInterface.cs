@@ -3,9 +3,11 @@
  */
 
 using System;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+//using Newtonsoft.Json.Serialization;
+
+
 //using SuperSocket.ClientEngine;
 //using WebSocket4Net;
 
@@ -246,6 +248,7 @@ namespace RippleLibSharp.Network
 		{
 
 			return Task.Run (
+#pragma warning disable RECS0002 // Convert anonymous method to method group
 				delegate {
 #if DEBUG
 					string method_sig = clsstr + "Task<bool> connectTask () : ";
@@ -259,6 +262,7 @@ namespace RippleLibSharp.Network
 
 					//return this.isConnected();
 				}
+#pragma warning restore RECS0002 // Convert anonymous method to method group
 
 			);
 		}
@@ -533,8 +537,8 @@ namespace RippleLibSharp.Network
 		private void Websocket_Closed (object sender, EventArgs e)
 		{
 			Logging.WriteLog ("Connection Closed\n");
-			if (onClose != null) {
-				onClose (sender, e);
+			if (OnClose != null) {
+				OnClose (sender, e);
 			} else {
 				Logging.WriteLog ("NetworkInterface : Error : onClose == null\n");
 			}
@@ -557,16 +561,21 @@ namespace RippleLibSharp.Network
 			//this.stopConnect = true;
 			//this.connectattempts = 0;
 			Logging.WriteLog ("Connection Opened\n");
-			if (onOpen != null) {
-				onOpen (sender, e);
+			if (OnOpen != null) {
+				OnOpen (sender, e);
 			} else {
 				Logging.WriteLog ("NetworkInterface : Error: onOpen == null\n");
 			}
 
 
+
+
 			Thread.Sleep (5);
-			onOpenWaitHandler.Set ();
+			OnOpenWaitHandler.Set ();
 		}
+
+
+
 
 		public void SendToServer (String message)
 		{
@@ -717,9 +726,9 @@ namespace RippleLibSharp.Network
 			}
 #endif
 
-			if (onMessage != null) {
+			if (OnMessage != null) {
 				// todo should this print
-				onMessage (this, e);  // All networking depends on this being called. 
+				OnMessage (this, e);  // All networking depends on this being called. 
 
 			} else {
 				Logging.WriteLog ("NetworkInterface : method processIncomingJson : Critical Error : onMessage == null\n");
@@ -790,6 +799,8 @@ namespace RippleLibSharp.Network
 #pragma warning disable 0168
 			} catch (Exception e) {
 #pragma warning restore 0168
+
+
 #if DEBUG
 				Logging.WriteLog (method_sig + "Exception thrown : \n" + e.Message + "\n");
 #endif
@@ -825,6 +836,8 @@ namespace RippleLibSharp.Network
 #endif
 
 
+			//websocket.ReceiveBufferSize = 128000;
+
 			websocket.Opened += Websocket_Opened;
 
 
@@ -832,7 +845,12 @@ namespace RippleLibSharp.Network
 			websocket.Closed += Websocket_Closed;
 
 			websocket.MessageReceived += (object sender, WebSocket4Net.MessageReceivedEventArgs e) =>
+
+			Task.Run (delegate {
+
 				this.ProcessIncomingJson (e);
+			});
+
 
 			/*
 			websocket.MessageReceived += delegate(object sender, MessageReceivedEventArgs e) {
@@ -852,10 +870,65 @@ namespace RippleLibSharp.Network
 
 
 
-			websocket.Error += ErrorFunction;
+
+			
+		
+
+			websocket.Error += (sender, ev) => {
 
 
+#if DEBUG
 
+				if (DebugRippleLibSharp.NetworkInterface) {
+					Logging.WriteLog ("Error Occured\n" + ev.Exception.Message + "\n");
+				}
+
+#endif
+
+
+				if (
+					ev.Exception.Message.Equals ("RemoteCertificateChainErrors")
+					|| ev.Exception.Message.Equals ("RemoteCertificateNotAvailable")) {
+
+					//if (e.Exception.Message.Equals ("RemoteCertificateNotAvailable")) {
+
+					String message = "\nUnable to establish an ssl connection, you need to install the servers ssl security certificate\n" +
+					    "Example # certmgr --ssl " +
+		    ///* url + 
+		   				 "  ( using the command line of your local operating system terminal/cmd.exe ect )\n\n" +
+					    "if that doesn't work try importing mozilla's certificate store" +
+					    "Example# mozroots --import --sync \n";
+
+					//MainWindow.currentInstance
+
+#if DEBUG
+					if (DebugRippleLibSharp.NetworkInterface) {
+						Logging.WriteLog (message);
+						//Logging.WriteLog ("should print" + e.Exception.Message);
+						Logging.WriteLog ("should print" + ev.Exception.Message);
+					}
+#endif
+
+					
+
+					//return;
+				}
+
+
+				//stopConnect = true;
+				//throw ev.Exception;
+				//return;
+				
+
+				var exc = ev.Exception;
+
+				IhildaWebSocketError error = new IhildaWebSocketError {
+					Exception = exc
+				};
+
+				OnError?.Invoke ( this, error);
+			};
+	    		
 
 			//};
 			NetworkRequestTask.InitNetworkTasking (this);
@@ -866,50 +939,16 @@ namespace RippleLibSharp.Network
 
 
 
-		private void ErrorFunction (object sender, SuperSocket.ClientEngine.ErrorEventArgs e)
-		{
-			//websocket.Error += delegate(object sender, ErrorEventArgs e) {
+		/*
+			private void ErrorFunction (object sender, System.IO.ErrorEventArgs e)
+			{
+		    //websocket.Error += delegate(object sender, ErrorEventArgs e) {
 
-			//stopConnect = true;
+		    //stopConnect = true;
 
-			if (e.Exception.Message.Equals ("RemoteCertificateNotAvailable")) {
-
-				String message = "Unable to establish an ssl connection, you need to install the servers ssl security certificate\n" +
-					"Example # certmgr --ssl " +
-					///* url + 
-					"  ( using the command line of your local operating system terminal/cmd.exe ect )\n\n" +
-					"if that doesn't work try importing mozilla's certificate store" +
-					"Example# mozroots --import --sync \n";
-
-				//MainWindow.currentInstance
-
-#if DEBUG
-				if (DebugRippleLibSharp.NetworkInterface) {
-					Logging.WriteLog (message);
-					Logging.WriteLog ("should print" + e.Exception.Message);
-				}
-#endif
-
-
-
-
-
-
-
-				return;
 			}
 
-
-#if DEBUG
-			if (DebugRippleLibSharp.NetworkInterface) {
-				Logging.WriteLog ("Error Occured\n" + e.Exception.Message + "\n");
-			}
-#endif
-			//stopConnect = true;
-			return;
-		}
-
-
+		*/
 
 
 
@@ -947,8 +986,8 @@ namespace RippleLibSharp.Network
 				Logging.WriteLog (method_sig + "waiting on onOpenWaitHandler...\n"); // TODO print to console non debug mode?
 			}
 #endif
-			onOpenWaitHandler.Reset ();
-			onOpenWaitHandler.WaitOne ();
+			OnOpenWaitHandler.Reset ();
+			OnOpenWaitHandler.WaitOne ();
 
 #if DEBUG
 			if (DebugRippleLibSharp.NetworkInterface) {
@@ -999,27 +1038,31 @@ namespace RippleLibSharp.Network
 		}
 
 
+
+
+
 		#region handlers
 		public delegate void OnMessageEventHandler (object sender, WebSocket4Net.MessageReceivedEventArgs e);
 
-		public OnMessageEventHandler onMessage;
+		public OnMessageEventHandler OnMessage;
 
 
 
 
 		public delegate void connectEventHandler (object sender, EventArgs e);
 
-		public connectEventHandler onOpen;
+		public connectEventHandler OnOpen;
 
-		public connectEventHandler onClose;
+		public connectEventHandler OnClose;
 
-		//public delegate void errorEventHandler (object sender, SuperSocket.ClientEngine.ErrorEventArgs e);
-		public delegate void errorEventHandler (object sender, EventArgs e);
-		public errorEventHandler onError;
+		//public event EventHandler<SuperSocket.ClientEngine.ErrorEventArgs> OnError;
+		public event errorEventHandler OnError;
+		public delegate void errorEventHandler (object o, IhildaWebSocketError e);
 
 
 
-		private EventWaitHandle onOpenWaitHandler = new ManualResetEvent (true);
+		// TODO how to dispose ??
+		private EventWaitHandle OnOpenWaitHandler = new ManualResetEvent (true);
 		#endregion
 
 #if DEBUG
@@ -1029,7 +1072,11 @@ namespace RippleLibSharp.Network
 	}
 
 
-
+	public class IhildaWebSocketError
+	{
+		
+		public Exception Exception { get; set; }
+	}
 
 
 }
