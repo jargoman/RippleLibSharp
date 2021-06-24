@@ -1443,19 +1443,6 @@
         <member name="M:NBitcoin.BouncyCastle.Crypto.Digests.RipeMD160Digest.Reset">
             reset the chaining variables to the IV values.
         </member>
-        <member name="T:NBitcoin.BouncyCastle.Crypto.Digests.Sha1Digest">
-             implementation of SHA-1 as outlined in "Handbook of Applied Cryptography", pages 346 - 349.
-            
-             It is interesting to ponder why the, apart from the extra IV, the other difference here from MD5
-             is the "endianness" of the word processing!
-        </member>
-        <member name="M:NBitcoin.BouncyCastle.Crypto.Digests.Sha1Digest.#ctor(NBitcoin.BouncyCastle.Crypto.Digests.Sha1Digest)">
-            Copy constructor.  This will copy the state of the provided
-            message digest.
-        </member>
-        <member name="M:NBitcoin.BouncyCastle.Crypto.Digests.Sha1Digest.Reset">
-            reset the chaining variables
-        </member>
         <member name="T:NBitcoin.BouncyCastle.Crypto.Digests.Sha224Digest">
             SHA-224 as described in RFC 3874
             <pre>
@@ -3252,7 +3239,7 @@
              </code>
              </example>
         </member>
-        <member name="M:NBitcoin.Crypto.Pbkdf2.#ctor(NBitcoin.BouncyCastle.Crypto.IMac,System.Byte[],System.Int32)">
+        <member name="M:NBitcoin.Crypto.Pbkdf2.#ctor(System.Security.Cryptography.KeyedHashAlgorithm,System.Byte[],System.Int32)">
             <summary>
             Creates a new PBKDF2 stream.
             </summary>
@@ -3271,7 +3258,7 @@
             <param name="count">The number of bytes to read.</param>
             <returns>Bytes from the derived key stream.</returns>
         </member>
-        <member name="M:NBitcoin.Crypto.Pbkdf2.ComputeDerivedKey(NBitcoin.BouncyCastle.Crypto.IMac,System.Byte[],System.Int32,System.Int32)">
+        <member name="M:NBitcoin.Crypto.Pbkdf2.ComputeDerivedKey(System.Security.Cryptography.KeyedHashAlgorithm,System.Byte[],System.Int32,System.Int32)">
             <summary>
             Computes a derived key.
             </summary>
@@ -3285,7 +3272,7 @@
             <param name="derivedKeyLength">The desired length of the derived key.</param>
             <returns>The derived key.</returns>
         </member>
-        <member name="M:NBitcoin.Crypto.Pbkdf2.Dispose(System.Boolean)">
+        <member name="M:NBitcoin.Crypto.Pbkdf2.Close">
             <summary>
             Closes the stream, clearing memory and disposing of the HMAC algorithm.
             </summary>
@@ -3492,6 +3479,69 @@
             A IHDScriptPubKey represent an object which represent a tree of scriptPubKeys
             </summary>
         </member>
+        <member name="M:NBitcoin.IpExtensions.ToEndpointString(System.Net.EndPoint)">
+            <summary>
+            Return {host}:{port} of this endpoint.
+            </summary>
+            <param name="endpoint"></param>
+            <returns>{host}:{port} representation of this endpoint</returns>
+        </member>
+        <member name="M:NBitcoin.IpExtensions.AsOnionDNSEndpoint(System.Net.EndPoint)">
+            <summary>
+            Convert an onion cat IPEndpoint to an onion DnsEndpoint
+            If endpoint is already an onion DnsEndpoint, return it.
+            Else returns null.
+            </summary>
+            <param name="endpoint"></param>
+            <returns>An onion DNS endpoint or null</returns>
+        </member>
+        <member name="M:NBitcoin.IpExtensions.TryConvertToOnionDNSEndpoint(System.Net.EndPoint,System.Net.DnsEndPoint@)">
+            <summary>
+            Convert an onion cat IPEndpoint to an onion DnsEndpoint
+            If endpoint is already an onion DnsEndpoint, return it.
+            If the endpoint is not an onion endpoint v2, return false.
+            </summary>
+            <param name="endpoint">The tor endpoint</param>
+            <param name="dnsEndpoint">The onion dns enpoint</param>
+            <returns>True if the onioncat address has been successfully parsed as a dns onion address</returns>
+        </member>
+        <member name="M:NBitcoin.IpExtensions.AsOnionCatIPEndpoint(System.Net.EndPoint)">
+            <summary>
+            Convert an onion DNS endpoint to an onioncat IpEndpoint
+            If endpoint is already an onioncat IPEndpoint, return it.
+            Else returns null.
+            </summary>
+            <param name="endpoint"></param>
+            <returns></returns>
+        </member>
+        <member name="M:NBitcoin.IpExtensions.ResolveToIPEndpointsAsync(System.Net.EndPoint)">
+            <summary>
+            <para>Will properly convert <paramref name="endpoint"/> to IPEndpoint
+            If <paramref name="endpoint"/> is a DNSEndpoint is an onion host (Tor v2), it will be converted into onioncat address
+            else, a DNS resolution will be made and all resolved addresses will be returned</para>
+            <para>If <paramref name="endpoint"/> is a IPEndpoint, it will be returned as-is.</para>
+            You can pass any endpoint parsed by <see cref="M:NBitcoin.Utils.ParseEndpoint(System.String,System.Int32)"/>
+            </summary>
+            <param name="endpoint">The endpoint to convert to IPEndpoint</param>
+            <exception cref="T:System.ArgumentNullException">The endpoint is null</exception>
+            <exception cref="T:System.Net.Sockets.SocketException">An error is encountered when resolving the dns name.</exception>
+            <exception cref="T:System.NotSupportedException">The endpoint passed can't be converted into an Ip (eg. An onion host which is not TorV2)</exception>
+        </member>
+        <member name="M:NBitcoin.IpExtensions.ResolveToIPEndpointsAsync(System.Net.EndPoint,NBitcoin.Protocol.IDnsResolver,System.Threading.CancellationToken)">
+            <summary>
+            <para>Will properly convert <paramref name="endpoint"/> to IPEndpoint
+            If <paramref name="endpoint"/> is a DNSEndpoint is an onion host (Tor v2), it will be converted into onioncat address
+            else, a DNS resolution will be made and all resolved addresses will be returned</para>
+            <para>If <paramref name="endpoint"/> is a IPEndpoint, it will be returned as-is.</para>
+            You can pass any endpoint parsed by <see cref="M:NBitcoin.Utils.ParseEndpoint(System.String,System.Int32)"/>
+            </summary>
+            <param name="endpoint">The endpoint to convert to IPEndpoint</param>
+            <param name="dnsResolver">The DNS Resolver</param>
+            <param name="cancellationToken">The cancellation token</param>
+            <exception cref="T:System.ArgumentNullException">The endpoint is null</exception>
+            <exception cref="T:System.Net.Sockets.SocketException">An error is encountered when resolving the dns name.</exception>
+            <exception cref="T:System.NotSupportedException">The endpoint passed can't be converted into an Ip (eg. An onion host which is not TorV2)</exception>
+        </member>
         <member name="T:NBitcoin.ITransactionRepository">
             <summary>
             Represent a transaction map
@@ -3499,7 +3549,7 @@
         </member>
         <member name="M:NBitcoin.Key.GetWif(NBitcoin.Network)">
             <summary>
-            Same than GetBitcoinSecret
+            Same as GetBitcoinSecret
             </summary>
             <param name="network"></param>
             <returns></returns>
@@ -3621,6 +3671,13 @@
             <param name="amount"></param>
             <param name="margin">error margin (between 0 and 1)</param>
             <returns>true if equals, else false</returns>
+        </member>
+        <member name="M:NBitcoin.Network.GetDefaultDataFolder(System.String)">
+            <summary>
+            Returns the default data directory of bitcoin correctly accross OS
+            </summary>
+            <param name="folderName">The name of the folder</param>
+            <returns>The full path to the data directory of Bitcoin</returns>
         </member>
         <member name="M:NBitcoin.Network.CreateBitcoinAddress(System.String)">
             <summary>
@@ -3769,6 +3826,11 @@
             </summary>
             <returns>true if the certificate chain and the signature is trusted or if PKIType == None</returns>
         </member>
+        <member name="M:NBitcoin.Payment.WindowsCertificateServiceProvider.GetCertificateName(System.Security.Cryptography.X509Certificates.X509Certificate2)">
+            <summary>
+            Get the certificate name from the certificate subject
+            </summary>
+        </member>
         <member name="M:NBitcoin.Policy.ITransactionPolicy.Check(NBitcoin.Transaction,NBitcoin.ICoin[])">
             <summary>
             Check if the given transaction violate the policy
@@ -3802,9 +3864,557 @@
             Check the standardness of scriptPubKey
             </summary>
         </member>
+        <member name="T:NBitcoin.Protocol.AddressManager">
+            <summary>
+            The AddressManager, keep a set of peers discovered on the network in cache can update their actual states.
+            Replicate AddressManager of Bitcoin Core, the Buckets and BucketPosition are not guaranteed to be coherent with Bitcoin Core
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.AddressManager.AddAsync(System.Net.EndPoint,System.Net.IPAddress)">
+            <summary>
+            Will properly convert a endpoint to IPEndpoint
+            If endpoint is a DNSEndpoint, a DNS resolution will be made and all addresses added
+            If endpoint is a DNSEndpoint for onion, it will be converted into onioncat address
+            If endpoint is an IPEndpoint it is added to AddressManager
+            </summary>
+            <param name="endpoint">The endpoint to add to the address manager</param>
+            <param name="source">The source which advertized this endpoint (default: IPAddress.Loopback)</param>
+            <returns></returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.AddressManager.AddAsync(System.Net.EndPoint,System.Net.IPAddress,System.Threading.CancellationToken)">
+            <summary>
+            Will properly convert a endpoint to IPEndpoint
+            If endpoint is a DNSEndpoint, a DNS resolution will be made and all addresses added
+            If endpoint is a DNSEndpoint for onion, it will be converted into onioncat address
+            If endpoint is an IPEndpoint it is added to AddressManager
+            </summary>
+            <param name="endpoint">The endpoint to add to the address manager</param>
+            <param name="source">The source which advertized this endpoint (default: IPAddress.Loopback)</param>
+            <param name="cancellationToken">The cancellationToken</param>
+            <returns></returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.AddressManager.Select">
+            <summary>
+            Choose an address to connect to.
+            </summary>
+            <returns>The network address of a peer, or null if none are found</returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.AddressManager.GetAddr">
+            <summary>
+            Return a bunch of addresses, selected at random.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="F:NBitcoin.Protocol.Behaviors.AddressManagerBehaviorMode.None">
+            <summary>
+            Do not advertise or discover new peers
+            </summary>
+        </member>
+        <member name="F:NBitcoin.Protocol.Behaviors.AddressManagerBehaviorMode.Advertize">
+            <summary>
+            Only advertise known peers
+            </summary>
+        </member>
+        <member name="F:NBitcoin.Protocol.Behaviors.AddressManagerBehaviorMode.Discover">
+            <summary>
+            Only discover peers
+            </summary>
+        </member>
+        <member name="F:NBitcoin.Protocol.Behaviors.AddressManagerBehaviorMode.AdvertizeDiscover">
+            <summary>
+            Advertise known peer and discover peer
+            </summary>
+        </member>
+        <member name="T:NBitcoin.Protocol.Behaviors.AddressManagerBehavior">
+            <summary>
+            The AddressManagerBehavior class will respond to getaddr and register advertised nodes from addr messages to the AddressManager.
+            The AddressManagerBehavior will also receive feedback about connection attempt and success of discovered peers to the AddressManager, so it can be used later to find valid peer faster.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.AddressManagerBehavior.PeersToDiscover">
+            <summary>
+            The minimum number of peers to discover before trying to connect to a node using the AddressManager (Default: 1000)
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.Behaviors.BroadcastHub.BroadcastTransactionAsync(NBitcoin.Transaction)">
+            <summary>
+            Broadcast a transaction on the hub
+            </summary>
+            <param name="transaction">The transaction to broadcast</param>
+            <returns>The cause of the rejection or null</returns>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.BroadcastHub.ManualBroadcast">
+            <summary>
+            If true, the user need to call BroadcastTransactions to ask to the nodes to broadcast it
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.Behaviors.BroadcastHub.BroadcastTransactions">
+            <summary>
+            Ask the nodes in the hub to broadcast transactions in the Hub manually
+            </summary>
+        </member>
+        <member name="T:NBitcoin.Protocol.Behaviors.ChainBehavior">
+            <summary>
+            The Chain Behavior is responsible for keeping a ConcurrentChain up to date with the peer, it also responds to getheaders messages.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.ChainBehavior.StripHeader">
+            <summary>
+            If true, the Chain maintained by the behavior with have its ChainedBlock with no Header (default: false)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.ChainBehavior.SkipPoWCheck">
+            <summary>
+            If true, skip PoW checks (default: false)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.ChainBehavior.CanSync">
+            <summary>
+            Keep the chain in Sync (Default : true)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.ChainBehavior.CanRespondToGetHeaders">
+            <summary>
+            Respond to getheaders messages (Default : true)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.ChainBehavior.Synching">
+            <summary>
+            Using for test, this might not be reliable
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.Behaviors.ChainBehavior.CheckAnnouncedBlocks">
+            <summary>
+            Check if any past blocks announced by this peer is in the invalid blocks list, and set InvalidHeaderReceived flag accordingly
+            </summary>
+            <returns>True if no invalid block is received</returns>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.ChainBehavior.AutoSync">
+            <summary>
+            Sync the chain as headers come from the network (Default : true)
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.Behaviors.ChainBehavior.TrySync">
+            <summary>
+            Asynchronously try to sync the chain
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.ChainBehavior.State.HighestValidatedPoW">
+            <summary>
+            ChainBehaviors sharing this state will not broadcast headers which are above HighestValidatedPoW
+            </summary>
+        </member>
+        <member name="T:NBitcoin.Protocol.Behaviors.NodesGroupBehavior">
+            <summary>
+            Maintain connection to a given set of nodes
+            </summary>
+        </member>
+        <member name="T:NBitcoin.Protocol.Behaviors.PingPongBehavior">
+            <summary>
+            The PingPongBehavior is responsible for firing ping message every PingInterval and responding with pong message, and close the connection if the Ping has not been completed after TimeoutInterval.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.PingPongBehavior.Mode">
+            <summary>
+            Whether the behavior send Ping and respond with Pong (Default : Both)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.PingPongBehavior.TimeoutInterval">
+            <summary>
+            Interval after which an unresponded Ping will result in a disconnection. (Default : 20 minutes)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.PingPongBehavior.PingInterval">
+            <summary>
+            Interval after which a Ping message is fired after the last received Pong (Default : 2 minutes)
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.Behaviors.PingPongBehavior.Probe">
+            <summary>
+            Send a ping asynchronously
+            </summary>
+        </member>
+        <member name="T:NBitcoin.Protocol.Behaviors.SlimChainBehavior">
+            <summary>
+            Behavior to keep a SlimChain in sync with the remote node
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.SocksSettingsBehavior.SocksEndpoint">
+            <summary>
+            If the socks endpoint to connect to
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.SocksSettingsBehavior.OnlyForOnionHosts">
+            <summary>
+            If the socks proxy is only used for Tor traffic (default: true)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.SocksSettingsBehavior.NetworkCredential">
+            <summary>
+            Credentials to connect to the SOCKS proxy (Use StreamIsolation instead if you want Tor isolation)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Behaviors.SocksSettingsBehavior.StreamIsolation">
+            <summary>
+            Randomize the NetworkCredentials to the Socks proxy
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Connectors.DefaultEndpointConnector.AllowOnlyTorEndpoints">
+            <summary>
+            Connect to only hidden service nodes over Tor.
+            Prevents connecting to clearnet nodes over Tor.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.DnsSocksResolver.NetworkCredential">
+            <summary>
+            Credentials to connect to the SOCKS proxy (Use StreamIsolation instead if you want Tor isolation)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.DnsSocksResolver.StreamIsolation">
+            <summary>
+            Randomize the NetworkCredentials to the Socks proxy
+            </summary>
+        </member>
+        <member name="T:NBitcoin.Protocol.Filters.INodeFilter">
+            <summary>
+            A NodeFilter can intercept messages received and sent.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.Filters.INodeFilter.OnReceivingMessage(NBitcoin.Protocol.IncomingMessage,System.Action)">
+            <summary>
+            Intercept a message before it can be processed by listeners
+            </summary>
+            <param name="message">The message</param>
+            <param name="next">The rest of the pipeline</param>
+        </member>
+        <member name="M:NBitcoin.Protocol.Filters.INodeFilter.OnSendingMessage(NBitcoin.Protocol.Node,NBitcoin.Protocol.Payload,System.Action)">
+            <summary>
+            Intercept a message before it is sent to the peer
+            </summary>
+            <param name="node"></param>
+            <param name="payload"></param>
+            <param name="next">The rest of the pipeline</param>
+        </member>
         <member name="F:NBitcoin.Protocol.Message._SkipMagic">
             <summary>
             When parsing, maybe Magic is already parsed
+            </summary>
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddressType.Unroutable">
+            Addresses from these networks are not publicly routable on the global Internet.
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddressType.Onion">
+            TOR (v2 or v3)
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddressType.I2P">
+            I2P
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddressType.Cjdns">
+            CJDNS
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.AddrV2Format">
+            see: https://github.com/bitcoin/bips/blob/master/bip-0155.mediawiki
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.Network.Unroutable">
+            Addresses from these networks are not publicly routable on the global Internet.
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.Network.Onion">
+            TOR (v2 or v3)
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.Network.I2P">
+            I2P
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.Network.Cjdns">
+            CJDNS
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.ADDR_IPV4_SIZE">
+            Size of IPv4 address (in bytes).
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.ADDR_IPV6_SIZE">
+            Size of IPv6 address (in bytes).
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.ADDR_TORV2_SIZE">
+            Size of TORv2 address (in bytes).
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.ADDR_TORV3_SIZE">
+            Size of TORv3 address (in bytes). This is the length of just the address
+            as used in BIP155, without the checksum and the version byte.
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.ADDR_I2P_SIZE">
+            Size of I2P address (in bytes).
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.ADDR_CJDNS_SIZE">
+            Size of CJDNS address (in bytes).
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.TORV3_ADDR_CHECKSUM_LEN">
+            Size of the TORv3 address checksum (in bytes)
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.TORV3_ADDR_VERSION_LEN">
+            Size of the TORv3 address version number (in bytes)
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.IPV4_IN_IPV6_PREFIX">
+            Prefix of an IPv6 address when it contains an embedded IPv4 address.
+            Used when (un)serializing addresses in ADDRv1 format (pre-BIP155).
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.TORV2_IN_IPV6_PREFIX">
+            Prefix of an IPv6 address when it contains an embedded TORv2 address.
+            Used when (un)serializing addresses in ADDRv1 format (pre-BIP155).
+            Such dummy IPv6 addresses are guaranteed to not be publicly routable as they
+            fall under RFC4193's fc00::/7 subnet allocated to unique-local addresses.
+        </member>
+        <member name="F:NBitcoin.Protocol.NetworkAddress.INTERNAL_IN_IPV6_PREFIX">
+            Prefix of an IPv6 address when it contains an embedded "internal" address.
+            Used when (un)serializing addresses in ADDRv1 format (pre-BIP155).
+            The prefix comes from 0xFD + SHA256("bitcoin")[0:5].
+            Such dummy IPv6 addresses are guaranteed to not be publicly routable as they
+            fall under RFC4193's fc00::/7 subnet allocated to unique-local addresses.
+        </member>
+        <member name="P:NBitcoin.Protocol.SynchronizeChainOptions.HashStop">
+            <summary>
+            Location until which synchronization should be stopped (default: null)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.SynchronizeChainOptions.SkipPoWCheck">
+            <summary>
+            Skip PoW check
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.SynchronizeChainOptions.StripHeaders">
+            <summary>
+            Strip headers from the retrieved chain
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.Connect(NBitcoin.Network,NBitcoin.Protocol.AddressManager,NBitcoin.Protocol.NodeConnectionParameters,System.Net.EndPoint[])">
+            <summary>
+            Connect to a random node on the network
+            </summary>
+            <param name="network">The network to connect to</param>
+            <param name="addrman">The addrman used for finding peers</param>
+            <param name="parameters">The parameters used by the found node</param>
+            <param name="connectedEndpoints">The already connected endpoints, the new endpoint will be select outside of existing groups</param>
+            <returns></returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.Connect(NBitcoin.Network,NBitcoin.Protocol.NodeConnectionParameters,System.Net.EndPoint[],System.Func{System.Net.EndPoint,System.Byte[]})">
+            <summary>
+            Connect to a random node on the network
+            </summary>
+            <param name="network">The network to connect to</param>
+            <param name="parameters">The parameters used by the found node, use AddressManagerBehavior.GetAddrman for finding peers</param>
+            <param name="connectedEndpoints">The already connected endpoints, the new endpoint will be select outside of existing groups</param>
+            <param name="getGroup">Group selector, by default NBicoin.IpExtensions.GetGroup</param>
+            <returns></returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.ConnectToLocal(NBitcoin.Network,NBitcoin.Protocol.NodeConnectionParameters)">
+            <summary>
+            Connect to the node of this machine
+            </summary>
+            <param name="network"></param>
+            <param name="parameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.SendMessageAsync(NBitcoin.Protocol.Payload)">
+            <summary>
+            Send a message to the peer asynchronously
+            </summary>
+            <param name="payload">The payload to send</param>
+            <param name="System.OperationCanceledException.OperationCanceledException">The node has been disconnected</param>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.SendMessage(NBitcoin.Protocol.Payload,System.Threading.CancellationToken)">
+            <summary>
+            Send a message to the peer synchronously
+            </summary>
+            <param name="payload">The payload to send</param>
+            <exception cref="T:System.ArgumentNullException">Payload is null</exception>
+            <param name="System.OperationCanceledException.OperationCanceledException">The node has been disconnected, or the cancellation token has been set to canceled</param>
+        </member>
+        <member name="P:NBitcoin.Protocol.Node.Version">
+            <summary>
+            The negociated protocol version (minimum of supported version between MyVersion and the PeerVersion)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Node.Advertize">
+            <summary>
+            Send addr unsolicited message of the AddressFrom peer when passing to Handshaked state
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.RespondToHandShake(System.Threading.CancellationToken)">
+            <summary>
+            
+            </summary>
+            <param name="cancellation"></param>
+        </member>
+        <member name="P:NBitcoin.Protocol.Node.PreferredTransactionOptions">
+            <summary>
+            Transaction options we would like
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Node.SupportedTransactionOptions">
+            <summary>
+            Transaction options supported by the peer
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Node.PreferAddressV2">
+            <summary>
+            Transaction options supported by the peer
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.Node.ActualTransactionOptions">
+            <summary>
+            Transaction options we prefer and which is also supported by peer
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.GetChain(NBitcoin.Protocol.SynchronizeChainOptions,System.Threading.CancellationToken)">
+            <summary>
+            Get the chain of headers from the peer (thread safe)
+            </summary>
+            <param name="options">The synchronization chain options</param>
+            <param name="cancellationToken"></param>
+            <returns>The chain of headers</returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.GetSlimChain(NBitcoin.uint256,System.Threading.CancellationToken)">
+            <summary>
+            Get the chain of block hashes from the peer (thread safe)
+            </summary>
+            <param name="hashStop">Location until which synchronization should be stopped (default: null)</param>
+            <param name="cancellationToken"></param>
+            <returns>The chain of headers</returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.GetChain(NBitcoin.uint256,System.Threading.CancellationToken)">
+            <summary>
+            Get the chain of headers from the peer (thread safe)
+            </summary>
+            <param name="hashStop">The highest block wanted</param>
+            <param name="cancellationToken"></param>
+            <returns>The chain of headers</returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.SynchronizeChain(NBitcoin.ChainBase,NBitcoin.Protocol.SynchronizeChainOptions,System.Threading.CancellationToken)">
+            <summary>
+            Synchronize a given Chain to the tip of this node if its height is higher. (Thread safe)
+            </summary>
+            <param name="chain">The chain to synchronize</param>
+            <param name="options">The synchronisation options</param>
+            <param name="cancellationToken"></param>
+            <returns>The chain of block retrieved</returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.SynchronizeChain(NBitcoin.ChainBase,NBitcoin.uint256,System.Threading.CancellationToken)">
+            <summary>
+            Synchronize a given Chain to the tip of this node if its height is higher. (Thread safe)
+            </summary>
+            <param name="chain">The chain to synchronize</param>
+            <param name="hashStop">The location until which it synchronize</param>
+            <param name="cancellationToken"></param>
+            <returns>The chain of block retrieved</returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.SynchronizeSlimChain(NBitcoin.SlimChain,NBitcoin.uint256,System.Threading.CancellationToken)">
+            <summary>
+            Synchronize a given SlimChain to the tip of this node if its height is higher.
+            </summary>
+            <param name="chain">The chain to synchronize</param>
+            <param name="hashStop">The location until which it synchronize</param>
+            <param name="cancellationToken"></param>
+            <returns>Task which finish when complete</returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.CreateListener">
+            <summary>
+            Create a listener that will queue messages until disposed
+            </summary>
+            <returns>The listener</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if used on the listener's thread, as it would result in a deadlock</exception>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.GetMempoolTransactions(System.Threading.CancellationToken)">
+            <summary>
+            Retrieve transactions from the mempool
+            </summary>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Transactions in the mempool</returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.GetMempoolTransactions(NBitcoin.uint256[],System.Threading.CancellationToken)">
+            <summary>
+            Retrieve transactions from the mempool by ids
+            </summary>
+            <param name="txIds">Transaction ids to retrieve</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>The transactions, if a transaction is not found, then it is not returned in the array.</returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.AddSupportedOptions(NBitcoin.Protocol.InventoryType)">
+            <summary>
+            Add supported option to the input inventory type
+            </summary>
+            <param name="inventoryType">Inventory type (like MSG_TX)</param>
+            <returns>Inventory type with options (MSG_TX | MSG_WITNESS_FLAG)</returns>
+        </member>
+        <member name="M:NBitcoin.Protocol.Node.PingPong(System.Threading.CancellationToken)">
+            <summary>
+            Emit a ping and wait the pong
+            </summary>
+            <param name="cancellation"></param>
+            <returns>Latency</returns>
+        </member>
+        <member name="P:NBitcoin.Protocol.NodeConnectionParameters.Advertize">
+            <summary>
+            Send addr unsolicited message of the AddressFrom peer when passing to Handshaked state
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.NodeConnectionParameters.IsRelay">
+            <summary>
+            If true, the node will receive all incoming transactions if no bloomfilter are set
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.NodeConnectionParameters.ReuseBuffer">
+            <summary>
+            Whether we reuse a 1MB buffer for deserializing messages, for limiting GC activity (Default : true)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.NodeServer.InboundNodeConnectionParameters">
+            <summary>
+            The parameters that will be cloned and applied for each node connecting to the NodeServer
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.NodesGroup.Connect">
+            <summary>
+            Start connecting asynchronously to remote peers
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.NodesGroup.Disconnect">
+            <summary>
+            Drop connection to all connected nodes
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.NodesGroup.Purge(System.String)">
+            <summary>
+            Asynchronously create a new set of nodes
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.NodesGroup.MaximumNodeConnection">
+            <summary>
+            The number of node that this behavior will try to maintain online (Default : 8)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.NodesGroup.AllowSameGroup">
+            <summary>
+            If false, the search process will do its best to connect to Node in different network group to prevent sybil attacks. (Default : false)
+            If CustomGroupSelector is set, AllowSameGroup is ignored.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.NodesGroup.CustomGroupSelector">
+            <summary>
+            How to calculate a group of an ip, by default using NBitcoin.IpExtensions.GetGroup.
+            Overrides AllowSameGroup.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.Protocol.NodesGroup.Dispose">
+            <summary>
+            Same as Disconnect
+            </summary>
+        </member>
+        <member name="T:NBitcoin.Protocol.AddrPayload">
+            <summary>
+            An available peer address in the bitcoin network is announced (unsolicited or after a getaddr)
+            </summary>
+        </member>
+        <member name="T:NBitcoin.Protocol.AddrV2Payload">
+            <summary>
+            An available peer address in the bitcoin network is announced (unsolicited or after a getaddrv2)
             </summary>
         </member>
         <member name="T:NBitcoin.Protocol.BlockPayload">
@@ -3890,6 +4500,57 @@
         <member name="T:NBitcoin.Protocol.TxPayload">
             <summary>
             Represents a transaction being sent on the network, is sent after being requested by a getdata (of Transaction or MerkleBlock) message.
+            </summary>
+        </member>
+        <member name="F:NBitcoin.Protocol.NodeServices.Network">
+            <summary>
+            NODE_NETWORK means that the node is capable of serving the block chain. It is currently
+            set by all Bitcoin Core nodes, and is unset by SPV clients or other peers that just want
+            network services but don't provide them.
+            </summary>
+        </member>
+        <member name="F:NBitcoin.Protocol.NodeServices.GetUTXO">
+            <summary>
+             NODE_GETUTXO means the node is capable of responding to the getutxo protocol request.
+            Bitcoin Core does not support this but a patch set called Bitcoin XT does.
+            See BIP 64 for details on how this is implemented.
+            </summary>
+        </member>
+        <member name="F:NBitcoin.Protocol.NodeServices.NODE_BLOOM">
+            <summary> NODE_BLOOM means the node is capable and willing to handle bloom-filtered connections.
+            Bitcoin Core nodes used to support this by default, without advertising this bit,
+            but no longer do as of protocol version 70011 (= NO_BLOOM_VERSION)
+            </summary>
+        </member>
+        <member name="F:NBitcoin.Protocol.NodeServices.NODE_WITNESS">
+            <summary> Indicates that a node can be asked for blocks and transactions including
+            witness data. 
+            </summary> 
+        </member>
+        <member name="F:NBitcoin.Protocol.NodeServices.NODE_NETWORK_LIMITED">
+            <summary> NODE_NETWORK_LIMITED means the same as NODE_NETWORK with the limitation of only
+            serving the last 288 (2 day) blocks
+            See BIP159 for details on how this is implemented.
+            </summary> 
+        </member>
+        <member name="P:NBitcoin.Protocol.SocketSettings.ReceiveTimeout">
+            <summary>
+            Set <see cref="P:System.Net.Sockets.Socket.ReceiveTimeout"/> value before connecting
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.SocketSettings.SendTimeout">
+            <summary>
+            Set <see cref="P:System.Net.Sockets.Socket.SendTimeout"/> value before connecting
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.SocketSettings.ReceiveBufferSize">
+            <summary>
+            Set <see cref="P:System.Net.Sockets.Socket.ReceiveBufferSize"/> value before connecting
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.SocketSettings.SendBufferSize">
+            <summary>
+            Set <see cref="P:System.Net.Sockets.Socket.SendBufferSize"/> value before connecting
             </summary>
         </member>
         <member name="P:NBitcoin.Protocol.ProtocolCapabilities.PeerTooOld">
@@ -4504,6 +5165,16 @@
             Permanently marks a block as invalid, as if it violated a consensus rule.
             </summary>
             <param name="blockhash">the hash of the block to mark as invalid</param>
+        </member>
+        <member name="M:NBitcoin.RPC.RPCClient.AddPeerAddress(System.Net.IPAddress,System.Int32)">
+            <summary>
+            Add the address of a potential peer to the address manager. This RPC is for testing only.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.RPC.RPCClient.AddPeerAddressAsync(System.Net.IPAddress,System.Int32)">
+            <summary>
+            Add the address of a potential peer to the address manager. This RPC is for testing only.
+            </summary>
         </member>
         <member name="M:NBitcoin.RPC.RPCClient.GetAddressInfo(NBitcoin.IDestination)">
             <summary>
@@ -6757,6 +7428,13 @@
             </summary>
             <param name="ignored">Parameter ignored</param>
             <returns>Now expressed as a Unix timestamp</returns>
+        </member>
+        <member name="M:NBitcoin.ThreadSafeCollection`1.Add(`0)">
+            <summary>
+            Add an item to the collection
+            </summary>
+            <param name="item"></param>
+            <returns>When disposed, the item is removed</returns>
         </member>
         <member name="M:NBitcoin.ThreadSafeList`1.Add(`0)">
             <summary>

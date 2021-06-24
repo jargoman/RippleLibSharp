@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 //using SuperSocket.ClientEngine;
 //using WebSocket4Net;
 
+
 //using Codeplex.Data;  // try not to use this here to properly separate code 
 using RippleLibSharp.Util;
 
@@ -537,6 +538,7 @@ namespace RippleLibSharp.Network
 		private void Websocket_Closed (object sender, EventArgs e)
 		{
 			Logging.WriteLog ("Connection Closed\n");
+
 			if (OnClose != null) {
 				OnClose (sender, e);
 			} else {

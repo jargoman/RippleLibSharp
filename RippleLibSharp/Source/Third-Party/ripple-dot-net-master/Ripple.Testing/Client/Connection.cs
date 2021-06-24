@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using log4net;
 using Newtonsoft.Json.Linq;
 using Ripple.Core;
-using Ripple.Core.ShaMapTree;
 using Ripple.Core.Types;
 using Ripple.Testing.Utils;
 using WebSocketSharp;

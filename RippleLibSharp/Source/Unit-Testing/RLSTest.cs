@@ -229,8 +229,8 @@ namespace Source.UnitTesting
 
 			ConnectionSettings connectInfo = new ConnectionSettings {
 
-				//ServerUrls = new string[] { "wss://s1.ripple.com:443", "wss://s2.ripple.com:443" };
-				ServerUrls = new string [] { "wss://s.altnet.rippletest.net:51233" },
+				ServerUrls = new string[] { "wss://s1.ripple.com:443", "wss://s2.ripple.com:443" },
+				//ServerUrls = new string [] { "wss://s.altnet.rippletest.net:51233" },
 
 				//ServerUrls = new string[] { "wss://127.0.0.1:6006" };
 				LocalUrl = "localhost",
