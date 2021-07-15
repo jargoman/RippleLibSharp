@@ -1,0 +1,34 @@
+<text class="codelabel">Sign and submit the transaction</text>
+<div class="codeblock">
+<pre>
+tx.AutoRequestFee(
+    network,
+    token);
+
+tx.AutoRequestSequence(
+    address,
+    network,
+    token);
+
+<text class="declared">RippleIdentifier</text> secret = <text class="keyword">new</text> <text class="declared">RippleSeedAddress</text>(<text class="codestr">"the secret"</text>);
+
+<text class="comment">//RippleIdentifier secret = <text class="keyword">new</text> RipplePrivateKey("");</text>
+
+<text class="comment">// Sign with rippled // rippled must be installed and running</text>
+tx.SignLocalRippled(secret);
+
+<text class="comment">// Or sigh with</text>
+tx.SignRippleDotNet(secret);
+
+<text class="comment">// Or sign with</text>
+<text class="comment">// Currently broken !!</text>
+tx.SignRippleLibSharp(secret);
+
+<text class="declared">Response</text>&#60;<text class="declared">RippleSubmitTxResult</text>&#62; submitTask = tx.Submit(network, token);
+
+<text class="keyword">var</text> outcome = submitTask.result;
+
+Console.WriteLine(
+    outcome.engine_result );
+</pre>
+</div>

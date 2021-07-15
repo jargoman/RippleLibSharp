@@ -1,0 +1,60 @@
+---
+layout: default
+title: Ihilda Documentation
+banner: Ihilda Documentation
+doctitle: RippleLibSharp Path Find Example
+usings:
+  [
+    "System.Threading",
+    "System.Threading.Tasks",
+    "RippleLibSharp.Commands.Accounts",
+    "RippleLibSharp.Commands.Stipulate",
+    "RippleLibSharp.Keys",
+    "RippleLibSharp.Network",
+    "RippleLibSharp.Result",
+    "RippleLibSharp.Transactions",
+    "RippleLibSharp.Transactions.TxTypes",
+  ]
+---
+
+{% include usings.html %}
+
+{% include networking.html %}
+
+
+<text class="codelabel">Retrieve a list of possible paths for a payment</text>
+<div class="codeblock importantcode">
+<pre>
+<text class="keyword">string</text> address = "";
+<text class="keyword">string</text> destination = "";
+
+<text class="declared">RippleCurrency</text> recieve_amount = <text class="keyword">new</text> <text class="declared">RippleCurrency</text>(<text class="keyword">1.0m</text>);
+
+<text class="keyword">var</text> task = <text class="declared">PathFind</text>.GetResult(
+    address,
+    destination,
+    recieve_amount,
+    network,
+    token
+);
+
+task.Wait();
+
+<text class="keyword">var</text> resp = task.Result;
+
+<text class="declared">PathFindResult</text> path_result = resp.result;
+
+<text class="declared">RipplePaymentTransaction</text> tx = <text class="keyword">new</text> <text class="declared">RipplePaymentTransaction</text>
+  {
+      Destination = path_result.destination_account,
+      Account = path_result.source_account,
+      Amount = path_result.destination_amount,
+      Paths = usersChoice.paths_computed,
+      SendMax = usersChoice.source_amount
+  };
+
+
+</pre>
+</div>
+
+{% include txsign.html %}

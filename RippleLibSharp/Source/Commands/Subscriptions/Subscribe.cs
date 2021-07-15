@@ -36,7 +36,14 @@ namespace RippleLibSharp.Commands.Subscriptions
 
 
 
-			Task<Response<SubscribeServerResult>> task = NetworkRequestTask.RequestResponse<SubscribeServerResult> (identifierTag, request, ni, token, responsesConsumer);
+			Task<Response<SubscribeServerResult>> task = 
+                NetworkRequestTask
+                .RequestResponse<SubscribeServerResult> (
+                    identifierTag, 
+                    request, 
+                    ni, 
+                    token, 
+                    responsesConsumer);
 
 			return task;
 		}
@@ -65,7 +72,15 @@ namespace RippleLibSharp.Commands.Subscriptions
 
 			string request = DynamicJson.Serialize (o);
 
-			Task<Response<SubscribeServerResult>> task = NetworkRequestTask.RequestResponse<SubscribeServerResult> (identifierTag, request, ni, token, responsesConsumer);
+			Task<Response<SubscribeServerResult>> task = 
+                NetworkRequestTask
+                .RequestResponse<SubscribeServerResult> (
+                    identifierTag, 
+                    request, 
+                    ni, 
+                    token, 
+                    responsesConsumer);
+
 			task.ContinueWith((arg) => {
 				
 				//arg.Result.
@@ -108,7 +123,13 @@ namespace RippleLibSharp.Commands.Subscriptions
 			string request = DynamicJson.Serialize (o);
 
 			Task<Response<AccountTxResult>> task = 
-				NetworkRequestTask.RequestResponse<AccountTxResult> (identifierTag, request, ni, token, responsesConsumer);
+				NetworkRequestTask
+                .RequestResponse<AccountTxResult> (
+                    identifierTag, 
+                    request, 
+                    ni, 
+                    token, 
+                    responsesConsumer);
 
 			return task;
 		}

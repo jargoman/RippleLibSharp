@@ -1,0 +1,67 @@
+---
+layout: default
+title: Ihilda Documentation
+banner: Ihilda Documentation
+doctitle: RippleLibSharp Bip39 Example
+usings:
+  [
+    "RippleLibSharp.Mnemonics"
+  ]
+---
+
+{% include usings.html %}
+
+<text class="codelabel"></text>
+<div class="codeblock importantcode">
+<pre>
+<text class="keyword">var</text> wrds = <text class="keyword">new</text> <text class="declared">List</text>&lt;<text class="keyword">string</text>&gt;() {
+    <text class="codestr">"piano"</text>,
+    <text class="codestr">"sleep"</text>,
+    <text class="codestr">"fall"</text>,
+    <text class="codestr">"aerobic"</text>,
+    <text class="codestr">"under"</text>,
+        <text class="codestr">"glide"</text>,
+        <text class="codestr">"today"</text>,
+        <text class="codestr">"favorite"</text>,
+        <text class="codestr">"response"</text>,
+        <text class="codestr">"family"</text>,
+    <text class="codestr">"basket"</text>,
+    <text class="codestr">"leader"</text>,
+    <text class="codestr">"inquiry"</text>,
+    <text class="codestr">"unable"</text>,
+    <text class="codestr">"useless"</text>
+    };
+
+
+<text class="declared">MnemonicIsValid</text> valid = <text class="declared">MnemonicWordList</text>.IsValid(wrds);
+
+<text class="keyword">if</text> (!valid.IsValid)
+{
+    <text class="declared">Console</text>.WriteLine(<text class="codestr">"Not valid : "</text>);
+    <text class="declared">Console</text>.WriteLine(valid.Message);
+    <text class="keyword">return</text>;
+}
+<text class="keyword">else</text>
+{
+    <text class="declared">Console</text>.WriteLine(valid.Message);
+}
+
+
+
+<text class="keyword">var</text> wrds =
+    <text class="codestr">"piano sleep fall aerobic under glide today favorite response family basket leader inquiry unable useless"</text>
+;
+
+<text class="keyword">var</text> nm = <text class="keyword">new</text> <text class="declared">MnemonicWordList</text>(wrds);
+nm.LoadKeysFromMnemonic();
+
+<text class="keyword">uint</text>[] accs = { <text class="keyword">0</text>, <text class="keyword">1</text>, <text class="keyword">2</text>, <text class="keyword">3</text>, <text class="keyword">4</text> };
+<text class="keyword">var</text> accounts = nm.GetAccounts(accs);
+
+
+<text class="keyword">foreach</text> (<text class="keyword">var</text> a <text class="keyword">in</text> accounts)
+{
+    Console.WriteLine(a.AsHex());
+}
+</pre>
+</div>

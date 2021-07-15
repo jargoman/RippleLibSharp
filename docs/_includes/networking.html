@@ -1,0 +1,28 @@
+<text class="codelabel">Connect to the xrp ledger</text>
+<div class="codeblock">
+<pre>
+<text class="keyword">var</text> tokenSource = <text class="keyword">new</text> <text class="declared">CancellationTokenSource</text>();
+
+<text class="keyword">var</text> token = tokenSource.Token;
+
+<text class="declared">ConnectionSettings</text> connectInfo = <text class="keyword">new</text> <text class="declared">ConnectionSettings</text>
+{
+
+    <text class="comment">// list of server url's in prefered order.</text>
+    ServerUrls = <text class="keyword">new</text> <text class="declared">string</text>[] { <text class="codestr">"wss://s1.ripple.com:443"</text>, <text class="codestr">"wss://s2.ripple.com:443"</text> },
+
+
+    LocalUrl = <text class="codestr">"localhost"</text>,
+    UserAgent = <text class="codestr">"optional spoof browser user agent"</text>,
+    Reconnect = <text class="keyword">true</text>
+};
+
+
+<text class="declared">NetworkInterface</text> network = <text class="keyword">new</text> <text class="declared">NetworkInterface</text>(connectInfo);
+<text class="keyword">bool</text> didConnect = network.Connect();
+
+if (!didConnect) {
+    <text class="keyword">return;</text>
+}
+</pre>
+</div>

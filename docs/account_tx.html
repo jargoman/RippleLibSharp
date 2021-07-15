@@ -1,0 +1,42 @@
+---
+layout: default
+title: Ihilda Documentation
+banner: Ihilda Documentation
+doctitle: RippleLibSharp Account Transactions Example
+usings:
+  [
+    "System.Threading",
+    "System.Threading.Tasks",
+    "RippleLibSharp.Commands.Accounts",
+    "RippleLibSharp.Keys",
+    "RippleLibSharp.Network",
+    "RippleLibSharp.Result"
+  ]
+---
+
+{% include usings.html %}
+
+{% include networking.html %}
+
+<text class="codelabel">Retrieve transactions for an account</text>
+<div class="codeblock importantcode">
+<pre>
+<text class="declared">RippleAddress</text> account = <text class="keyword">new</text> <text class="declared">RippleAddress</text>(<text class="codestr">""</text>);
+
+<text class="keyword">string</text> ledger_index_min = <text class="keyword">null</text>;
+<text class="keyword">string</text> ledger_index_max = <text class="keyword">null</text>;
+<text class="keyword">int?</text> limit = <text class="keyword">null</text>;
+<text class="keyword">bool</text> forward = <text class="keyword">false</text>;
+
+<text class="keyword">var</text> task = <text class="declared">AccountTransactions</text>.GetResult(account, network, token);
+
+task.Wait(token);
+
+<text class="declared">Response</text>&lt;<text class="declared">AccountTxResult</text>&gt; response = task.Result;
+
+<text class="declared">AccountTxResult</text> accountTxResult = response.result;
+
+<text class="declared">RippleTxStructure</text>[] transactions = accountTxResult.transactions;
+
+</pre>
+</div>

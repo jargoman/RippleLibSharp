@@ -1,0 +1,33 @@
+---
+layout: default
+title: Ihilda Documentation
+banner: Ihilda Documentation
+doctitle: RippleLibSharp Ping Example
+usings:
+  [
+    "System.Threading",
+    "System.Threading.Tasks",
+    "RippleLibSharp.Commands.Accounts",
+    "RippleLibSharp.Keys",
+    "RippleLibSharp.Network",
+    "RippleLibSharp.Result"
+  ]
+---
+
+{% include usings.html %}
+
+{% include networking.html %}
+
+
+<text class="codelabel">Ping the server</text>
+<div class="codeblock importantcode">
+<pre>
+<text class="keyword">var</text> task = <text class="declared">Ping</text>.getResult(network, token);
+task.Wait();
+
+<text class="keyword">var</text> response = task.Result;
+
+<text class="declared">PingObject</text> ping = response.result;
+
+</pre>
+</div>

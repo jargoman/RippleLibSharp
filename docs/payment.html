@@ -1,0 +1,44 @@
+---
+layout: default
+title: Ihilda Documentation
+banner: Ihilda Documentation
+doctitle: RippleLibSharp Payment Example
+usings:
+  [
+    "System.Threading",
+    "RippleLibSharp.Keys",
+    "RippleLibSharp.Network",
+    "RippleLibSharp.Result",
+    "RippleLibSharp.Transactions",
+    "RippleLibSharp.Transactions.TxTypes"
+  ]
+---
+
+{% include usings.html %}
+
+{% include networking.html %}
+
+<text class="codelabel">Construct the payment transaction  </text><text class="codelabel importantlabel">*Key code</text>
+<div class="codeblock importantcode">
+<pre>
+<text class="keyword">var</text> dest = <text class="keyword">new</text> <text class="declared">RippleAddress</text>(<text class="codestr">"rBuDDpdVBt57JbyfXbs8gjWvp4ScKssHzx"</text>);
+
+<text class="keyword">var</text> address =
+    <text class="keyword">new</text> <text class="declared">RippleAddress</text>(<text class="codestr">"rJ8UEAvqsMtQqaRv9VdasEyrf5DauwgZSg"</text>);
+
+<text class="comment">// create one xrp</text>
+<text class="keyword">var</text> oneXRP = <text class="keyword">new</text> <text class="declared">RippleCurrency</text>(<text class="keyword">1.0m</text>);
+
+<text class="comment">// Construct payment transction</text>
+<text class="comment">// Note tx is declared to be of super type RippleTransacton</text>
+<text class="declared">RippleTransaction</text> tx =
+    <text class="keyword">new</text> <text class="declared">RipplePaymentTransaction</text>
+    {
+        Destination = dest,
+        Account = address,
+        Amount = oneXRP
+    };
+</pre>
+</div>
+
+{% include txsign.html %}

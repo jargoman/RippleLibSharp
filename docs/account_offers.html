@@ -1,0 +1,38 @@
+---
+layout: default
+banner: Ihilda Documentation
+doctitle: RippleLibSharp Account Currencies Example
+usings:
+  [
+    "System.Linq",
+    "System.Threading",
+    "System.Threading.Tasks",
+    "RippleLibSharp.Commands.Accounts",
+    "RippleLibSharp.Keys",
+    "RippleLibSharp.Network",
+    "RippleLibSharp.Result",
+    "RippleLibSharp.Transactions"
+  ]
+---
+
+{% include usings.html %}
+
+{% include networking.html %}
+
+<text class="codelabel">Retrieve currencies for account</text>
+<div class="codeblock importantcode">
+<pre>
+<text class="declared">RippleAddress</text> account = <text class="keyword">new</text> <text class="declared">RippleAddress</text>(<text class="codestr">""</text>);
+
+<text class="keyword">var</text> task = <text class="declared">AccountOffers</text>.GetResult(account, network, token);
+
+task.Wait(token);
+
+<text class="declared">Response</text>&lt;<text class="declared">AccountOffersResult</text>&gt; response = task.Result;
+
+<text class="declared">AccountOffersResult</text> accountOffersResult = response.result;
+
+<text class="keyword">Offer</text>[] account_offers = accountOffersResult.offers.ToArray();
+
+</pre>
+</div>

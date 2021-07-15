@@ -30,7 +30,7 @@ using Org.BouncyCastle.Math;
 using Ripple.TxSigning;
 using Newtonsoft.Json.Linq;
 using System.Collections;
-using RippleLibSharp.Source.Mnemonics;
+using RippleLibSharp.Mnemonics;
 
 namespace Source.UnitTesting
 {

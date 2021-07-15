@@ -1,0 +1,41 @@
+---
+layout: default
+title: Ihilda Documentation
+banner: Ihilda Documentation
+doctitle: RippleLibSharp Book Offers Example
+usings:
+  [
+    "System.Threading",
+    "RippleLibSharp.Commands.Stipulate",
+    "RippleLibSharp.Network",
+    "RippleLibSharp.Transactions",
+    "RippleLibSharp.Result"
+  ]
+---
+
+{% include usings.html %}
+
+{% include networking.html %}
+
+<text class="codelabel"></text>
+<div class="codeblock importantcode">
+<pre>
+
+<text class="declared">RippleCurrency</text> base_currency = <text class="keyword">new</text> <text class="declared">RippleCurrency</text>(<text class="keyword">1.0m</text>);
+
+<text class="declared">RippleCurrency</text> counter_currency = <text class="keyword">new</text> <text class="declared">RippleCurrency</text>(<text class="keyword">1.0m</text>, <text class="codestr">""</text>, <text class="codestr">"ICE"</text>);
+
+<text class="keyword">uint?</text> limit = <text class="keyword">200</text>;
+
+<text class="keyword">var</text> task = <text class="declared">BookOffers</text>.GetResult(
+    counter_currency,
+    base_currency,
+    limit,
+    network,
+    token);
+
+
+<text class="declared">Offer</text>[] offers = task?.Result?.result?.offers;
+
+</pre>
+</div>

@@ -1,0 +1,66 @@
+---
+layout: default
+title: Ihilda Documentation
+banner: Ihilda Documentation
+doctitle: RippleLibSharp Ledger Tracker Example
+usings:
+  [
+    "RippleLibSharp.Network",
+    "using RippleLibSharp.Commands.Subscriptions"
+  ]
+---
+
+{% include usings.html %}
+
+{% include networking.html %}
+
+<text class="codelabel">Set a delegate function for ledget events</text>
+<div class="codeblock importantcode">
+<pre>
+
+<text class="declared">LedgerTracker</text>.OnLedgerClosed += (<text class="keyword">object</text> sender, <text class="declared">LedgerClosed</text> ledgerCloseEvent) => {
+
+   <text class="keyword">int</text> fee_base = ledgerCloseEvent.fee_base;
+   <text class="keyword">int</text> fee_ref = ledgerCloseEvent.fee_ref;
+   <text class="keyword">string</text> ledger_hash = ledgerCloseEvent.ledger_hash;
+   <text class="keyword">uint</text> ledger_index = ledgerCloseEvent.ledger_index;
+   <text class="keyword">int</text> ledger_time = ledgerCloseEvent.ledger_time;
+   <text class="declared">DateTime</text> receivedTime = ledgerCloseEvent.ReceivedTime;
+   <text class="keyword">int</text> reserve_base = ledgerCloseEvent.reserve_base;
+   <text class="keyword">int</text> reserve_inc = ledgerCloseEvent.reserve_inc;
+   <text class="keyword">int</text> txn_count = ledgerCloseEvent.txn_count;
+   <text class="keyword">string</text> validated_ledgers = ledgerCloseEvent.validated_ledgers;
+
+
+   <text class="comment">/* your code here */</text>
+
+};
+
+<text class="declared">LedgerTracker</text>.OnServerStateChanged += (object sender, <text class="declared">ServerStateEventArgs</text> serverStateEvent) => {
+
+   <text class="keyword">var</text> base_fee = serverStateEvent.base_fee;
+   <text class="keyword">var</text> load_base = serverStateEvent.load_base;
+   <text class="keyword">var</text> load_factor = serverStateEvent.load_factor;
+   <text class="keyword">var</text> load_factor_fee_escalation = serverStateEvent.load_factor_fee_escalation;
+   <text class="keyword">var</text> load_factor_fee_queue = serverStateEvent.load_factor_fee_queue;
+   <text class="keyword">var</text> load_factor_fee_reference = serverStateEvent.load_factor_fee_reference;
+   <text class="keyword">var</text> load_factor_server = serverStateEvent.load_factor_server;
+   <text class="keyword">var</text> server_status = serverStateEvent.server_status;
+   <text class="keyword">var</text> eventType = serverStateEvent.type;
+
+   <text class="comment">/* your code here */</text>
+
+};
+
+</pre>
+</div>
+
+<text class="codelabel">Subscribe to ledger events</text>
+<div class="codeblock importantcode">
+<pre>
+
+<text class="declared">Subscribe</text>.LedgerSubscribe (network, token);
+<text class="declared">Subscribe</text>.ServerSubscribe (network, token);
+
+</pre>
+</div>

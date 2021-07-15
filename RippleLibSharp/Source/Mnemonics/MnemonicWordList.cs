@@ -8,7 +8,7 @@ using NBitcoin;
 using Org.BouncyCastle.Asn1.Sec;
 using RippleLibSharp.Keys;
 
-namespace RippleLibSharp.Source.Mnemonics
+namespace RippleLibSharp.Mnemonics
 {
 	public class MnemonicWordList
 	{
@@ -25,10 +25,16 @@ namespace RippleLibSharp.Source.Mnemonics
 
 		public static MnemonicIsValid IsValid (IEnumerable<string> words)
 		{
-			MnemonicIsValid mnemonicIsValid = new MnemonicIsValid ();
 
-			mnemonicIsValid.language = NBitcoin.Wordlist.AutoDetectLanguage (words.ToArray ());
-			Console.WriteLine (mnemonicIsValid.language);
+
+
+            MnemonicIsValid mnemonicIsValid = new MnemonicIsValid
+            {
+                language = NBitcoin.Wordlist.AutoDetectLanguage(words.ToArray())
+
+            };
+
+            Console.WriteLine (mnemonicIsValid.language);
 
 			if (mnemonicIsValid.language == Language.Unknown) {
 				mnemonicIsValid.IsValid = false;

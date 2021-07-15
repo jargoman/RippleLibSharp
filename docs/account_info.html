@@ -1,0 +1,39 @@
+---
+layout: default
+title: Ihilda Documentation
+banner: Ihilda Documentation
+doctitle: RippleLibSharp Account Info Example
+usings:
+  [
+    "System.Threading",
+    "System.Threading.Tasks",
+    "RippleLibSharp.Commands.Accounts",
+    "RippleLibSharp.Keys",
+    "RippleLibSharp.Network",
+    "RippleLibSharp.Result"
+  ]
+---
+
+{% include usings.html %}
+
+{% include networking.html %}
+
+<text class="codelabel">Retrieve account info</text>
+<div class="codeblock importantcode">
+<pre>
+<text class="declared">RippleAddress</text> account = <text class="keyword">new</text> <text class="declared">RippleAddress</text>(<text class="codestr">""</text>);
+
+<text class="keyword">var</text> task = <text class="declared">AccountInfo</text>.GetResult(account, network, token);
+
+task.Wait(token);
+
+<text class="declared">Response</text>&lt;<text class="declared">AccountInfoResult</text>&gt; response = task.Result;
+
+<text class="declared">AccountInfoResult</text> accountInfoResult = response.result;
+
+<text class="keyword">var</text> account_data = accountInfoResult.account_data;
+
+<text class="keyword">var</text> account_balance = accountInfoResult.GetNativeBalance();
+</pre>
+</div>
+</text>

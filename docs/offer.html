@@ -1,0 +1,44 @@
+---
+layout: default
+title: Ihilda Documentation
+banner: Ihilda Documentation
+doctitle: RippleLibSharp Offer Example
+usings:
+  [
+    "System.Threading",
+    "RippleLibSharp.Keys",
+    "RippleLibSharp.Network",
+    "RippleLibSharp.Result",
+    "RippleLibSharp.Transactions",
+    "RippleLibSharp.Transactions.TxTypes"
+  ]
+---
+
+
+
+{% include usings.html %}
+
+{% include networking.html %}
+
+<text class="codelabel">Construct the offer transaction  </text><text class="codelabel importantlabel">*Key code</text>
+<div class="codeblock importantcode">
+<pre>
+
+<text class="declared">RippleAddress</text> address = <text class="keyword">new</text> <text class="declared">RippleAddress</text>(<text class="codestr">""</text>);
+
+<text class="declared">RippleCurrency</text> takerGets = <text class="keyword">new</text> <text class="declared">RippleCurrency</text>(<text class="keyword">1.9m</text>);
+
+<text class="declared">RippleCurrency</text> takerPays = <text class="keyword">new</text> <text class="declared">RippleCurrency</text>(<text class="keyword">0.01m</text>, RippleAddress.RIPPLE_ADDRESS_BITSTAMP, <text class="codestr">"BTC"</text>);
+
+<text class="declared">Offer</text> off = <text class="keyword">new</text> <text class="declared">Offer</text>
+{
+    TakerPays = takerPays,
+    TakerGets = takerGets
+};
+
+<text class="declared">RippleTransaction</text> tx = <text class="keyword">new</text> <text class="declared">RippleOfferTransaction</text>(address, off);
+
+</pre>
+</div>
+
+{% include txsign.html %}

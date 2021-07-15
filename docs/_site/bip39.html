@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ihilda Documentation</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+
+  </head>
+
+
+
+  <body>
+    <div id="banner">
+
+
+
+<div id="logo">
+  <img src="assets/img/ihildaihlogo200px.png" width="100" width="100">
+</div>
+
+<div id="headline">
+  <h1>
+    Ihilda Documentation
+  </h1>
+
+
+
+</div>
+
+<div id="dloadlink">
+<a href="" id="dlnow">Download Now</a>
+</div>
+
+</div>
+
+
+    <div id="main">
+
+      <div id="left">
+        
+<div id="mainmenu">
+
+  <h4>Install</h4>
+  <nav>
+
+  </nav>
+
+  <h4>Start Up</h4>
+  <nav>
+
+  </nav>
+
+  <h4>Keys</h4>
+  <nav>
+
+  </nav>
+
+  <h4>Trust</h4>
+  <nav>
+    <ul>
+      <li><a href="account_currencies.html">Account Currencies</a></li>
+      <li><a href="account_info.html">Account Info</a></li>
+      <li><a href="account_offers.html">Account Offers</a></li>
+      <li><a href="account_tx.html">Account Transactions</a></li>
+      <li><a href="bip39.html">BIP39 Mnemonics</a></li>
+      <li><a href="book_offers.html">book_offers</a></li>
+      <li><a href="ledger_tracker.html">Ledger Tracker</a></li>
+      <li><a href="network.html">Network</a></li>
+      <li><a href="offer.html">Offer Create</a></li>
+      <li><a href="path_find.html">Path Find</a></li>
+      <li><a href="payment.html">Payment</a></li>
+      <li><a href="ping.html">Ping</a></li>
+      <li><a href="server_info.html">Server Info</a></li>
+      <li><a href="server_state.html">Server State</a></li>
+      <li><a href="subscribe.html">Subscribe</a></li>
+      <li><a href="trustline.html">Trustline</a></li>
+      <li><a href="tx_types.html">Transaction Types</a></li>
+      <li><a href="tx.html">Transaction Look up</a></li>
+
+    </ul>
+  </nav>
+
+  <h4>Payments</h4>
+  <nav>
+    <li></li>
+  </nav>
+
+
+  <h4>Trading</h4>
+  <nav>
+
+  </nav>
+
+
+</div>
+
+      </div>
+
+      <div id="right">
+        <div id="page">
+          <div id="glowstick">
+          <div id="glow">
+          <img src="assets/img/lightbulb100px.png" width="100px" height="100px" id="bulb">
+          </div>
+          </div>
+          <div id="innerpage">
+            <div class="titleblock">
+              <h1>RippleLibSharp Bip39 Example</h1>
+            </div>
+            <hr class="titleline">
+            <text class="codelabel">Import the necessary libraries</text>
+<div class="codeblock">
+
+  <text class="keyword">using </text><text class="declared">RippleLibSharp.Mnemonics</text>;<br><br>
+
+</div>
+
+
+<text class="codelabel"></text>
+<div class="codeblock importantcode">
+<pre>
+<text class="keyword">var</text> wrds = <text class="keyword">new</text> <text class="declared">List</text>&lt;<text class="keyword">string</text>&gt;() {
+    <text class="codestr">"piano"</text>,
+    <text class="codestr">"sleep"</text>,
+    <text class="codestr">"fall"</text>,
+    <text class="codestr">"aerobic"</text>,
+    <text class="codestr">"under"</text>,
+        <text class="codestr">"glide"</text>,
+        <text class="codestr">"today"</text>,
+        <text class="codestr">"favorite"</text>,
+        <text class="codestr">"response"</text>,
+        <text class="codestr">"family"</text>,
+    <text class="codestr">"basket"</text>,
+    <text class="codestr">"leader"</text>,
+    <text class="codestr">"inquiry"</text>,
+    <text class="codestr">"unable"</text>,
+    <text class="codestr">"useless"</text>
+    };
+
+
+<text class="declared">MnemonicIsValid</text> valid = <text class="declared">MnemonicWordList</text>.IsValid(wrds);
+
+<text class="keyword">if</text> (!valid.IsValid)
+{
+    <text class="declared">Console</text>.WriteLine(<text class="codestr">"Not valid : "</text>);
+    <text class="declared">Console</text>.WriteLine(valid.Message);
+    <text class="keyword">return</text>;
+}
+<text class="keyword">else</text>
+{
+    <text class="declared">Console</text>.WriteLine(valid.Message);
+}
+
+
+
+<text class="keyword">var</text> wrds =
+    <text class="codestr">"piano sleep fall aerobic under glide today favorite response family basket leader inquiry unable useless"</text>
+;
+
+<text class="keyword">var</text> nm = <text class="keyword">new</text> <text class="declared">MnemonicWordList</text>(wrds);
+nm.LoadKeysFromMnemonic();
+
+<text class="keyword">uint</text>[] accs = { <text class="keyword">0</text>, <text class="keyword">1</text>, <text class="keyword">2</text>, <text class="keyword">3</text>, <text class="keyword">4</text> };
+<text class="keyword">var</text> accounts = nm.GetAccounts(accs);
+
+
+<text class="keyword">foreach</text> (<text class="keyword">var</text> a <text class="keyword">in</text> accounts)
+{
+    Console.WriteLine(a.AsHex());
+}
+</pre>
+</div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </body>
+
+
+</html>
