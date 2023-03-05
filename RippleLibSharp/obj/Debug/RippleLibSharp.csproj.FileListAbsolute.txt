@@ -21,11 +21,14 @@
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.IO.dll
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Linq.dll
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Linq.Expressions.dll
+/home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Memory.dll
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Net.Http.dll
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Net.NameResolution.dll
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Net.Security.dll
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Net.Sockets.dll
+/home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Numerics.Vectors.dll
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Reflection.dll
+/home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Runtime.CompilerServices.Unsafe.dll
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Runtime.dll
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Runtime.Extensions.dll
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Runtime.InteropServices.dll
@@ -47,8 +50,12 @@
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Buffers.xml
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/Microsoft.Extensions.Logging.Abstractions.xml
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/NBitcoin.xml
+/home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Numerics.Vectors.xml
+/home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Runtime.CompilerServices.Unsafe.xml
+/home/karim/Documents/RippleLibSharp/RippleLibSharp/bin/Debug/System.Memory.xml
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/obj/Debug/riplibsharp.exe.config
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/obj/Debug/RippleLibSharp.csproj.CoreCompileInputs.cache
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/obj/Debug/RippleLibSharp.csproj.CopyComplete
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/obj/Debug/riplibsharp.exe
 /home/karim/Documents/RippleLibSharp/RippleLibSharp/obj/Debug/riplibsharp.pdb
+/home/karim/Documents/RippleLibSharp/RippleLibSharp/obj/Debug/RippleLibSharp.csproj.AssemblyReference.cache

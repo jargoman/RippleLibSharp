@@ -234,14 +234,6 @@
             </summary>
             <returns>The built filter.</returns>
         </member>
-        <member name="P:NBitcoin.PSBTSettings.UseLowR">
-            <summary>
-            Test vector in the bip174 specify to use a signer which follows RFC 6979.
-            So we must sign without [LowR value assured way](https://github.com/MetacoSA/NBitcoin/pull/510)
-            This should be turned false only in the test.
-            ref: https://github.com/bitcoin/bitcoin/pull/13666
-            </summary>
-        </member>
         <member name="P:NBitcoin.PSBTSettings.CustomBuilderExtensions">
             <summary>
             Use custom builder extensions to customize finalization
@@ -289,7 +281,7 @@
             <param name="other"></param>
             <returns></returns>
         </member>
-        <member name="M:NBitcoin.PSBT.SignAll(NBitcoin.ScriptPubKeyType,NBitcoin.IHDKey,NBitcoin.RootedKeyPath,NBitcoin.SigHash)">
+        <member name="M:NBitcoin.PSBT.SignAll(NBitcoin.ScriptPubKeyType,NBitcoin.IHDKey,NBitcoin.RootedKeyPath)">
             <summary>
             Sign all inputs which derive <paramref name="accountKey"/> of type <paramref name="scriptPubKeyType"/>.
             </summary>
@@ -299,7 +291,7 @@
             <param name="sigHash">The SigHash</param>
             <returns>This PSBT</returns>
         </member>
-        <member name="M:NBitcoin.PSBT.SignAll(NBitcoin.ScriptPubKeyType,NBitcoin.IHDKey,NBitcoin.SigHash)">
+        <member name="M:NBitcoin.PSBT.SignAll(NBitcoin.ScriptPubKeyType,NBitcoin.IHDKey)">
             <summary>
             Sign all inputs which derive <paramref name="accountKey"/> of type <paramref name="scriptPubKeyType"/>.
             </summary>
@@ -308,7 +300,7 @@
             <param name="sigHash">The SigHash</param>
             <returns>This PSBT</returns>
         </member>
-        <member name="M:NBitcoin.PSBT.SignAll(NBitcoin.IHDScriptPubKey,NBitcoin.IHDKey,NBitcoin.SigHash)">
+        <member name="M:NBitcoin.PSBT.SignAll(NBitcoin.IHDScriptPubKey,NBitcoin.IHDKey)">
             <summary>
             Sign all inputs which derive addresses from <paramref name="accountHDScriptPubKey"/> and that need to be signed by <paramref name="accountKey"/>.
             </summary>
@@ -317,24 +309,13 @@
             <param name="sigHash">The SigHash</param>
             <returns>This PSBT</returns>
         </member>
-        <member name="M:NBitcoin.PSBT.SignAll(NBitcoin.IHDScriptPubKey,NBitcoin.IHDKey,NBitcoin.RootedKeyPath,NBitcoin.SigningOptions)">
+        <member name="M:NBitcoin.PSBT.SignAll(NBitcoin.IHDScriptPubKey,NBitcoin.IHDKey,NBitcoin.RootedKeyPath)">
             <summary>
             Sign all inputs which derive addresses from <paramref name="accountHDScriptPubKey"/> and that need to be signed by <paramref name="accountKey"/>.
             </summary>
             <param name="accountHDScriptPubKey">The address generator</param>
             <param name="accountKey">The account key with which to sign</param>
             <param name="accountKeyPath">The account key path (eg. [masterFP]/49'/0'/0')</param>
-            <param name="signingOptions">The signature options to use</param>
-            <returns>This PSBT</returns>
-        </member>
-        <member name="M:NBitcoin.PSBT.SignAll(NBitcoin.IHDScriptPubKey,NBitcoin.IHDKey,NBitcoin.RootedKeyPath,NBitcoin.SigHash)">
-            <summary>
-            Sign all inputs which derive addresses from <paramref name="accountHDScriptPubKey"/> and that need to be signed by <paramref name="accountKey"/>.
-            </summary>
-            <param name="accountHDScriptPubKey">The address generator</param>
-            <param name="accountKey">The account key with which to sign</param>
-            <param name="accountKeyPath">The account key path (eg. [masterFP]/49'/0'/0')</param>
-            <param name="sigHash">The SigHash</param>
             <returns>This PSBT</returns>
         </member>
         <member name="M:NBitcoin.PSBT.TryGetFee(NBitcoin.Money@)">
@@ -371,6 +352,13 @@
             </summary>
             <returns>The estimated fee</returns>
             <exception cref="T:System.InvalidOperationException">Not enough information to know about the fee rate</exception>
+        </member>
+        <member name="M:NBitcoin.PSBT.PrecomputeTransactionData">
+            <summary>
+            Returns a data structure precomputing some hash values that are needed for all inputs to be signed in the transaction.
+            </summary>
+            <returns>The PrecomputedTransactionData</returns>
+            <exception cref="T:NBitcoin.PSBTException">Throw if the PSBT is missing some previous outputs.</exception>
         </member>
         <member name="M:NBitcoin.PSBT.ExtractTransaction">
             <summary>
@@ -728,12 +716,6 @@
             chain code, depth, fingerprint, and child number.
             </summary>
         </member>
-        <member name="M:NBitcoin.ExtKey.#ctor(NBitcoin.Key,System.Byte[],System.Byte,System.Byte[],System.UInt32)">
-            <summary>
-            Constructor. Creates an extended key from the private key, and specified values for
-            chain code, depth, fingerprint, and child number.
-            </summary>
-        </member>
         <member name="M:NBitcoin.ExtKey.#ctor(NBitcoin.Key,System.Byte[])">
             <summary>
             Constructor. Creates an extended key from the private key, with the specified value
@@ -750,7 +732,7 @@
             Constructor. Creates a new extended key from the specified seed bytes, from the given hex string.
             </summary>
         </member>
-        <member name="M:NBitcoin.ExtKey.#ctor(System.Byte[])">
+        <member name="M:NBitcoin.ExtKey.#ctor(System.Byte[],System.Boolean)">
             <summary>
             Constructor. Creates a new extended key from the specified seed bytes.
             </summary>
@@ -821,7 +803,7 @@
         </member>
         <member name="M:NBitcoin.ExtPubKey.#ctor(System.Byte[],System.Int32,System.Int32)">
             <summary>
-            Constructor. Creates a new extended public key from the specified extended public key bytes.
+            Creates a new extended public key from the specified extended public key bytes.
             </summary>
         </member>
         <member name="M:NBitcoin.ExtPubKey.#ctor(System.String)">
@@ -904,6 +886,22 @@
             <param name="address"></param>
             <returns></returns>
         </member>
+        <member name="M:NBitcoin.BitcoinEncryptedSecret.GetKey(System.String)">
+            <summary>
+            Get the decrypted private key
+            </summary>
+            <param name="password">The password</param>
+            <returns>The decrypted key</returns>
+            <exception cref="T:System.Security.SecurityException">Invalid password</exception>
+        </member>
+        <member name="M:NBitcoin.BitcoinEncryptedSecret.TryGetKey(System.String,NBitcoin.Key@)">
+            <summary>
+            Get the decrypted private key
+            </summary>
+            <param name="password">The password</param>
+            <param name="key">The decrypted key if successfull</param>
+            <returns>True if successfull</returns>
+        </member>
         <member name="T:NBitcoin.Mnemonic">
             <summary>
             A .NET implementation of the Bitcoin Improvement Proposal - 39 (BIP39)
@@ -967,11 +965,6 @@
             <param name="expectedNetwork">The expected network to which it belongs</param>
             <returns>A BitcoinAddress or BitcoinScriptAddress</returns>
             <exception cref="T:System.FormatException">Invalid format</exception>
-        </member>
-        <member name="T:NBitcoin.IPubkeyHashUsable">
-            <summary>
-            Abstracts an object able to verify messages from which it is possible to extract public key.
-            </summary>
         </member>
         <member name="T:NBitcoin.BitcoinPubKeyAddress">
             <summary>
@@ -1047,13 +1040,6 @@
             <summary>
             Check proof of work and merkle root
             </summary>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.Block.Check(NBitcoin.Consensus)">
-            <summary>
-            Check proof of work and merkle root
-            </summary>
-            <param name="consensus"></param>
             <returns></returns>
         </member>
         <member name="T:NBitcoin.BlockLocator">
@@ -2942,26 +2928,6 @@
             <param name="b">Right side.</param>
             <returns>True if equal.</returns>
         </member>
-        <member name="M:NBitcoin.BouncyCastle.Utilities.Arrays.ConstantTimeAreEqual(System.Byte[],System.Byte[])">
-            <summary>
-            A constant time equals comparison - does not terminate early if
-            test will fail.
-            </summary>
-            <param name="a">first array</param>
-            <param name="b">second array</param>
-            <returns>true if arrays equal, false otherwise.</returns>
-        </member>
-        <member name="M:NBitcoin.BouncyCastle.Utilities.Arrays.CopyOfRange(System.Byte[],System.Int32,System.Int32)">
-             Make a copy of a range of bytes from the passed in data array. The range can
-             extend beyond the end of the input array, in which case the return array will
-             be padded with zeros.
-            
-             @param data the array from which the data is to be copied.
-             @param from the start index at which the copying should take place.
-             @param to the final index of the range (exclusive).
-            
-             @return a new byte array containing the range given.
-        </member>
         <member name="T:NBitcoin.BouncyCastle.Utilities.BigIntegers">
             BigInteger utilities.
         </member>
@@ -3195,14 +3161,15 @@
             <param name="scriptPubKey">The scriptPubKey</param>
             <returns>The hash of the scriptPubkey</returns>
         </member>
-        <member name="M:NBitcoin.StealthCoin.Find(NBitcoin.Transaction,NBitcoin.Stealth.BitcoinStealthAddress,NBitcoin.Key)">
+        <member name="P:NBitcoin.CompactSignature.RecoveryId">
             <summary>
-            Scan the Transaction for StealthCoin given address and scan key
+            
             </summary>
-            <param name="tx">The transaction to scan</param>
-            <param name="address">The stealth address</param>
-            <param name="scan">The scan private key</param>
-            <returns></returns>
+        </member>
+        <member name="P:NBitcoin.CompactSignature.Signature">
+            <summary>
+            The signature of 64 bytes
+            </summary>
         </member>
         <member name="T:NBitcoin.ConcurrentChain">
             <summary>
@@ -3390,7 +3357,7 @@
             </param>
             <returns>The effective salt.</returns>
         </member>
-        <member name="M:NBitcoin.Crypto.SCrypt.GetStream(System.Byte[],System.Byte[],System.Int32,System.Int32,System.Int32,System.Nullable{System.Int32})">
+        <member name="M:NBitcoin.Crypto.SCrypt.MFcrypt(System.Byte[],System.Byte[],System.Int32,System.Int32,System.Int32,System.Nullable{System.Int32})">
             <summary>
             Creates a derived key stream from which a derived key can be read.
             </summary>
@@ -3472,6 +3439,11 @@
         <member name="T:NBitcoin.IDestination">
             <summary>
             Represent any type which represent an underlying ScriptPubKey
+            </summary>
+        </member>
+        <member name="T:NBitcoin.IAddressableDestination">
+            <summary>
+            Represent any type which represent an underlying ScriptPubKey which can be represented as an address
             </summary>
         </member>
         <member name="T:NBitcoin.IHDScriptPubKey">
@@ -3691,7 +3663,7 @@
             <summary>
             Get network from name
             </summary>
-            <param name="name">main,mainnet,testnet,test,testnet3,reg,regtest,seg,segnet</param>
+            <param name="name">main,mainnet,testnet,test,testnet3,reg,regtest,sig,signet</param>
             <returns>The network or null of the name does not match any network</returns>
         </member>
         <member name="F:NBitcoin.BuriedDeployments.BIP34">
@@ -3783,54 +3755,6 @@
             https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki
             </summary>
         </member>
-        <member name="M:NBitcoin.Payment.PaymentMessage.SubmitPayment(System.Uri)">
-            <summary>
-            Send the payment to given address
-            </summary>
-            <param name="paymentUrl">ImplicitPaymentUrl if null</param>
-            <returns>The PaymentACK</returns>
-        </member>
-        <member name="P:NBitcoin.Payment.PaymentDetails.Time">
-            <summary>
-            timestamp (seconds since 1-Jan-1970 UTC) when the PaymentRequest was created.
-            </summary>
-        </member>
-        <member name="P:NBitcoin.Payment.PaymentDetails.Expires">
-            <summary>
-            timestamp (UTC) after which the PaymentRequest should be considered invalid. 
-            </summary>
-        </member>
-        <member name="P:NBitcoin.Payment.PaymentDetails.Memo">
-            <summary>
-            plain-text (no formatting) note that should be displayed to the customer, explaining what this PaymentRequest is for. 
-            </summary>
-        </member>
-        <member name="P:NBitcoin.Payment.PaymentDetails.PaymentUrl">
-            <summary>
-            Secure (usually https) location where a Payment message (see below) may be sent to obtain a PaymentACK. 
-            </summary>
-        </member>
-        <member name="P:NBitcoin.Payment.PaymentRequest.DefaultCertificateServiceProvider">
-            <summary>
-            Default application wide certificate service provider
-            </summary>
-        </member>
-        <member name="P:NBitcoin.Payment.PaymentRequest.CertificateServiceProvider">
-            <summary>
-            Instance specific certificate service provider
-            </summary>
-        </member>
-        <member name="M:NBitcoin.Payment.PaymentRequest.Verify">
-            <summary>
-            Verify that the certificate chain is trusted and signature correct.
-            </summary>
-            <returns>true if the certificate chain and the signature is trusted or if PKIType == None</returns>
-        </member>
-        <member name="M:NBitcoin.Payment.WindowsCertificateServiceProvider.GetCertificateName(System.Security.Cryptography.X509Certificates.X509Certificate2)">
-            <summary>
-            Get the certificate name from the certificate subject
-            </summary>
-        </member>
         <member name="M:NBitcoin.Policy.ITransactionPolicy.Check(NBitcoin.Transaction,NBitcoin.ICoin[])">
             <summary>
             Check if the given transaction violate the policy
@@ -3854,15 +3778,353 @@
             Safety check, if the FeeRate exceed this value, a policy error is raised
             </summary>
         </member>
-        <member name="P:NBitcoin.Policy.StandardTransactionPolicy.CheckMalleabilitySafe">
-            <summary>
-            Check if the transaction is safe from malleability (default: false)
-            </summary>
-        </member>
         <member name="P:NBitcoin.Policy.StandardTransactionPolicy.CheckScriptPubKey">
             <summary>
             Check the standardness of scriptPubKey
             </summary>
+        </member>
+        <member name="T:NBitcoin.PrecomputedTransactionData">
+            <summary>
+            A data structure precomputing some hash values that are needed for all inputs to be signed in the transaction.
+            </summary>
+        </member>
+        <member name="T:NBitcoin.PriorityQueue`2">
+            <summary>
+             Represents a min priority queue.
+            </summary>
+            <typeparam name="TElement">Specifies the type of elements in the queue.</typeparam>
+            <typeparam name="TPriority">Specifies the type of priority associated with enqueued elements.</typeparam>
+            <remarks>
+             Implements an array-backed quaternary min-heap. Each element is enqueued with an associated priority
+             that determines the dequeue order: elements with the lowest priority get dequeued first.
+            </remarks>
+        </member>
+        <member name="F:NBitcoin.PriorityQueue`2._nodes">
+            <summary>
+            Represents an implicit heap-ordered complete d-ary tree, stored as an array.
+            </summary>
+        </member>
+        <member name="F:NBitcoin.PriorityQueue`2._comparer">
+            <summary>
+            Custom comparer used to order the heap.
+            </summary>
+        </member>
+        <member name="F:NBitcoin.PriorityQueue`2._unorderedItems">
+            <summary>
+            Lazily-initialized collection used to expose the contents of the queue.
+            </summary>
+        </member>
+        <member name="F:NBitcoin.PriorityQueue`2._size">
+            <summary>
+            The number of nodes in the heap.
+            </summary>
+        </member>
+        <member name="F:NBitcoin.PriorityQueue`2._version">
+            <summary>
+            Version updated on mutation to help validate enumerators operate on a consistent state.
+            </summary>
+        </member>
+        <member name="F:NBitcoin.PriorityQueue`2.Arity">
+            <summary>
+            Specifies the arity of the d-ary heap, which here is quaternary.
+            It is assumed that this value is a power of 2.
+            </summary>
+        </member>
+        <member name="F:NBitcoin.PriorityQueue`2.Log2Arity">
+            <summary>
+            The binary logarithm of <see cref="F:NBitcoin.PriorityQueue`2.Arity" />.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.#ctor">
+            <summary>
+             Initializes a new instance of the <see cref="T:NBitcoin.PriorityQueue`2"/> class.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.#ctor(System.Int32)">
+            <summary>
+             Initializes a new instance of the <see cref="T:NBitcoin.PriorityQueue`2"/> class
+             with the specified initial capacity.
+            </summary>
+            <param name="initialCapacity">Initial capacity to allocate in the underlying heap array.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+             The specified <paramref name="initialCapacity"/> was negative.
+            </exception>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.#ctor(System.Collections.Generic.IComparer{`1})">
+            <summary>
+             Initializes a new instance of the <see cref="T:NBitcoin.PriorityQueue`2"/> class
+             with the specified custom priority comparer.
+            </summary>
+            <param name="comparer">
+             Custom comparer dictating the ordering of elements.
+             Uses <see cref="P:System.Collections.Generic.Comparer`1.Default" /> if the argument is <see langword="null"/>.
+            </param>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.#ctor(System.Int32,System.Collections.Generic.IComparer{`1})">
+            <summary>
+             Initializes a new instance of the <see cref="T:NBitcoin.PriorityQueue`2"/> class
+             with the specified initial capacity and custom priority comparer.
+            </summary>
+            <param name="initialCapacity">Initial capacity to allocate in the underlying heap array.</param>
+            <param name="comparer">
+             Custom comparer dictating the ordering of elements.
+             Uses <see cref="P:System.Collections.Generic.Comparer`1.Default" /> if the argument is <see langword="null"/>.
+            </param>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+             The specified <paramref name="initialCapacity"/> was negative.
+            </exception>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.#ctor(System.Collections.Generic.IEnumerable{System.ValueTuple{`0,`1}})">
+            <summary>
+             Initializes a new instance of the <see cref="T:NBitcoin.PriorityQueue`2"/> class
+             that is populated with the specified elements and priorities.
+            </summary>
+            <param name="items">The pairs of elements and priorities with which to populate the queue.</param>
+            <exception cref="T:System.ArgumentNullException">
+             The specified <paramref name="items"/> argument was <see langword="null"/>.
+            </exception>
+            <remarks>
+             Constructs the heap using a heapify operation,
+             which is generally faster than enqueuing individual elements sequentially.
+            </remarks>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.#ctor(System.Collections.Generic.IEnumerable{System.ValueTuple{`0,`1}},System.Collections.Generic.IComparer{`1})">
+            <summary>
+             Initializes a new instance of the <see cref="T:NBitcoin.PriorityQueue`2"/> class
+             that is populated with the specified elements and priorities,
+             and with the specified custom priority comparer.
+            </summary>
+            <param name="items">The pairs of elements and priorities with which to populate the queue.</param>
+            <param name="comparer">
+             Custom comparer dictating the ordering of elements.
+             Uses <see cref="P:System.Collections.Generic.Comparer`1.Default" /> if the argument is <see langword="null"/>.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+             The specified <paramref name="items"/> argument was <see langword="null"/>.
+            </exception>
+            <remarks>
+             Constructs the heap using a heapify operation,
+             which is generally faster than enqueuing individual elements sequentially.
+            </remarks>
+        </member>
+        <member name="P:NBitcoin.PriorityQueue`2.Count">
+            <summary>
+             Gets the number of elements contained in the <see cref="T:NBitcoin.PriorityQueue`2"/>.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.PriorityQueue`2.Comparer">
+            <summary>
+             Gets the priority comparer used by the <see cref="T:NBitcoin.PriorityQueue`2"/>.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.PriorityQueue`2.UnorderedItems">
+            <summary>
+             Gets a collection that enumerates the elements of the queue in an unordered manner.
+            </summary>
+            <remarks>
+             The enumeration does not order items by priority, since that would require N * log(N) time and N space.
+             Items are instead enumerated following the internal array heap layout.
+            </remarks>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.Enqueue(`0,`1)">
+            <summary>
+             Adds the specified element with associated priority to the <see cref="T:NBitcoin.PriorityQueue`2"/>.
+            </summary>
+            <param name="element">The element to add to the <see cref="T:NBitcoin.PriorityQueue`2"/>.</param>
+            <param name="priority">The priority with which to associate the new element.</param>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.Peek">
+            <summary>
+             Returns the minimal element from the <see cref="T:NBitcoin.PriorityQueue`2"/> without removing it.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">The <see cref="T:NBitcoin.PriorityQueue`2"/> is empty.</exception>
+            <returns>The minimal element of the <see cref="T:NBitcoin.PriorityQueue`2"/>.</returns>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.Dequeue">
+            <summary>
+             Removes and returns the minimal element from the <see cref="T:NBitcoin.PriorityQueue`2"/>.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">The queue is empty.</exception>
+            <returns>The minimal element of the <see cref="T:NBitcoin.PriorityQueue`2"/>.</returns>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.DequeueEnqueue(`0,`1)">
+            <summary>
+             Removes the minimal element and then immediately adds the specified element with associated priority to the <see cref="T:NBitcoin.PriorityQueue`2"/>,
+            </summary>
+            <param name="element">The element to add to the <see cref="T:NBitcoin.PriorityQueue`2"/>.</param>
+            <param name="priority">The priority with which to associate the new element.</param>
+            <exception cref="T:System.InvalidOperationException">The queue is empty.</exception>
+            <returns>The minimal element removed before performing the enqueue operation.</returns>
+            <remarks>
+             Implements an extract-then-insert heap operation that is generally more efficient
+             than sequencing Dequeue and Enqueue operations: in the worst case scenario only one
+             shift-down operation is required.
+            </remarks>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.TryDequeue(`0@,`1@)">
+            <summary>
+             Removes the minimal element from the <see cref="T:NBitcoin.PriorityQueue`2"/>,
+             and copies it to the <paramref name="element"/> parameter,
+             and its associated priority to the <paramref name="priority"/> parameter.
+            </summary>
+            <param name="element">The removed element.</param>
+            <param name="priority">The priority associated with the removed element.</param>
+            <returns>
+             <see langword="true"/> if the element is successfully removed;
+             <see langword="false"/> if the <see cref="T:NBitcoin.PriorityQueue`2"/> is empty.
+            </returns>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.TryPeek(`0@,`1@)">
+            <summary>
+             Returns a value that indicates whether there is a minimal element in the <see cref="T:NBitcoin.PriorityQueue`2"/>,
+             and if one is present, copies it to the <paramref name="element"/> parameter,
+             and its associated priority to the <paramref name="priority"/> parameter.
+             The element is not removed from the <see cref="T:NBitcoin.PriorityQueue`2"/>.
+            </summary>
+            <param name="element">The minimal element in the queue.</param>
+            <param name="priority">The priority associated with the minimal element.</param>
+            <returns>
+             <see langword="true"/> if there is a minimal element;
+             <see langword="false"/> if the <see cref="T:NBitcoin.PriorityQueue`2"/> is empty.
+            </returns>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.EnqueueDequeue(`0,`1)">
+            <summary>
+             Adds the specified element with associated priority to the <see cref="T:NBitcoin.PriorityQueue`2"/>,
+             and immediately removes the minimal element, returning the result.
+            </summary>
+            <param name="element">The element to add to the <see cref="T:NBitcoin.PriorityQueue`2"/>.</param>
+            <param name="priority">The priority with which to associate the new element.</param>
+            <returns>The minimal element removed after the enqueue operation.</returns>
+            <remarks>
+             Implements an insert-then-extract heap operation that is generally more efficient
+             than sequencing Enqueue and Dequeue operations: in the worst case scenario only one
+             shift-down operation is required.
+            </remarks>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.EnqueueRange(System.Collections.Generic.IEnumerable{System.ValueTuple{`0,`1}})">
+            <summary>
+             Enqueues a sequence of element/priority pairs to the <see cref="T:NBitcoin.PriorityQueue`2"/>.
+            </summary>
+            <param name="items">The pairs of elements and priorities to add to the queue.</param>
+            <exception cref="T:System.ArgumentNullException">
+             The specified <paramref name="items"/> argument was <see langword="null"/>.
+            </exception>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.EnqueueRange(System.Collections.Generic.IEnumerable{`0},`1)">
+            <summary>
+             Enqueues a sequence of elements pairs to the <see cref="T:NBitcoin.PriorityQueue`2"/>,
+             all associated with the specified priority.
+            </summary>
+            <param name="elements">The elements to add to the queue.</param>
+            <param name="priority">The priority to associate with the new elements.</param>
+            <exception cref="T:System.ArgumentNullException">
+             The specified <paramref name="elements"/> argument was <see langword="null"/>.
+            </exception>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.EnsureCapacity(System.Int32)">
+            <summary>
+             Ensures that the <see cref="T:NBitcoin.PriorityQueue`2"/> can hold up to
+             <paramref name="capacity"/> items without further expansion of its backing storage.
+            </summary>
+            <param name="capacity">The minimum capacity to be used.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+             The specified <paramref name="capacity"/> is negative.
+            </exception>
+            <returns>The current capacity of the <see cref="T:NBitcoin.PriorityQueue`2"/>.</returns>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.TrimExcess">
+            <summary>
+             Sets the capacity to the actual number of items in the <see cref="T:NBitcoin.PriorityQueue`2"/>,
+             if that is less than 90 percent of current capacity.
+            </summary>
+            <remarks>
+             This method can be used to minimize a collection's memory overhead
+             if no new elements will be added to the collection.
+            </remarks>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.Grow(System.Int32)">
+            <summary>
+            Grows the priority queue to match the specified min capacity.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.RemoveRootNode">
+            <summary>
+            Removes the node from the root of the heap
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.GetParentIndex(System.Int32)">
+            <summary>
+            Gets the index of an element's parent.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.GetFirstChildIndex(System.Int32)">
+            <summary>
+            Gets the index of the first child of an element.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.Heapify">
+            <summary>
+            Converts an unordered list into a heap.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.MoveUpDefaultComparer(System.ValueTuple{`0,`1},System.Int32)">
+            <summary>
+            Moves a node up in the tree to restore heap order.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.MoveUpCustomComparer(System.ValueTuple{`0,`1},System.Int32)">
+            <summary>
+            Moves a node up in the tree to restore heap order.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.MoveDownDefaultComparer(System.ValueTuple{`0,`1},System.Int32)">
+            <summary>
+            Moves a node down in the tree to restore heap order.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.MoveDownCustomComparer(System.ValueTuple{`0,`1},System.Int32)">
+            <summary>
+            Moves a node down in the tree to restore heap order.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.InitializeComparer(System.Collections.Generic.IComparer{`1})">
+            <summary>
+            Initializes the custom comparer to be used internally by the heap.
+            </summary>
+        </member>
+        <member name="T:NBitcoin.PriorityQueue`2.UnorderedItemsCollection">
+            <summary>
+             Enumerates the contents of a <see cref="T:NBitcoin.PriorityQueue`2"/>, without any ordering guarantees.
+            </summary>
+        </member>
+        <member name="T:NBitcoin.PriorityQueue`2.UnorderedItemsCollection.Enumerator">
+            <summary>
+             Enumerates the element and priority pairs of a <see cref="T:NBitcoin.PriorityQueue`2"/>,
+             without any ordering guarantees.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.UnorderedItemsCollection.Enumerator.Dispose">
+            <summary>
+            Releases all resources used by the <see cref="T:NBitcoin.PriorityQueue`2.UnorderedItemsCollection.Enumerator"/>.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.UnorderedItemsCollection.Enumerator.MoveNext">
+            <summary>
+            Advances the enumerator to the next element of the <see cref="P:NBitcoin.PriorityQueue`2.UnorderedItems"/>.
+            </summary>
+            <returns><see langword="true"/> if the enumerator was successfully advanced to the next element; <see langword="false"/> if the enumerator has passed the end of the collection.</returns>
+        </member>
+        <member name="P:NBitcoin.PriorityQueue`2.UnorderedItemsCollection.Enumerator.Current">
+            <summary>
+            Gets the element at the current position of the enumerator.
+            </summary>
+        </member>
+        <member name="M:NBitcoin.PriorityQueue`2.UnorderedItemsCollection.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through the <see cref="P:NBitcoin.PriorityQueue`2.UnorderedItems"/>.
+            </summary>
+            <returns>An <see cref="T:NBitcoin.PriorityQueue`2.UnorderedItemsCollection.Enumerator"/> for the <see cref="P:NBitcoin.PriorityQueue`2.UnorderedItems"/>.</returns>
         </member>
         <member name="T:NBitcoin.Protocol.AddressManager">
             <summary>
@@ -4360,11 +4622,6 @@
             If true, the node will receive all incoming transactions if no bloomfilter are set
             </summary>
         </member>
-        <member name="P:NBitcoin.Protocol.NodeConnectionParameters.ReuseBuffer">
-            <summary>
-            Whether we reuse a 1MB buffer for deserializing messages, for limiting GC activity (Default : true)
-            </summary>
-        </member>
         <member name="P:NBitcoin.Protocol.NodeServer.InboundNodeConnectionParameters">
             <summary>
             The parameters that will be cloned and applied for each node connecting to the NodeServer
@@ -4422,6 +4679,26 @@
             A block received after being asked with a getdata message
             </summary>
         </member>
+        <member name="T:NBitcoin.Protocol.CompactFilterPayload">
+            <summary>
+            Represents the p2p message payload used for sharing a block's compact filter.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.CompactFilterPayload.FilterType">
+            <summary>
+            Gets the Filter type for which headers are requested.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.CompactFilterPayload.FilterBytes">
+            <summary>
+            Gets the serialized compact filter for this block.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.CompactFilterPayload.BlockHash">
+            <summary>
+            Gets block hash of the Bitcoin block for which the filter is being returned.
+            </summary>
+        </member>
         <member name="T:NBitcoin.Protocol.FilterLoadPayload">
             <summary>
             Load a bloomfilter in the peer, used by SPV clients
@@ -4435,6 +4712,46 @@
         <member name="T:NBitcoin.Protocol.GetBlocksPayload">
             <summary>
             Ask for the block hashes (inv) that happened since BlockLocators
+            </summary>
+        </member>
+        <member name="T:NBitcoin.Protocol.CompactFiltersQueryPayload">
+            <summary>
+            Represents the p2p message payload used for requesting a range of compact filter/headers.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.CompactFiltersQueryPayload.FilterType">
+            <summary>
+            Gets the Filter type for which headers are requested.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.CompactFiltersQueryPayload.StartHeight">
+            <summary>
+            Gets the height of the first block in the requested range.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.CompactFiltersQueryPayload.StopHash">
+            <summary>
+            Gets the hash of the last block in the requested range.
+            </summary>
+        </member>
+        <member name="T:NBitcoin.Protocol.GetCompactFiltersPayload">
+            <summary>
+            Represents the p2p message payload used for requesting a range of compact filter.
+            </summary>
+        </member>
+        <member name="T:NBitcoin.Protocol.GetCompactFilterHeadersPayload">
+            <summary>
+            Represents the p2p message payload used for requesting a range of compact filter headers.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.GetCompactFilterCheckPointPayload.FilterType">
+            <summary>
+            Gets the Filter type for which headers are requested.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.Protocol.GetCompactFilterCheckPointPayload.StopHash">
+            <summary>
+            Gets the hash of the last block in the requested range.
             </summary>
         </member>
         <member name="T:NBitcoin.Protocol.GetDataPayload">
@@ -4470,26 +4787,6 @@
         <member name="T:NBitcoin.Protocol.NotFoundPayload">
             <summary>
             A getdata message for an asked hash is not found by the remote peer
-            </summary>
-        </member>
-        <member name="T:NBitcoin.Protocol.RejectPayload">
-            <summary>
-            A transaction or block are rejected being transmitted through tx or block messages
-            </summary>
-        </member>
-        <member name="P:NBitcoin.Protocol.RejectPayload.Message">
-            <summary>
-            "tx" or "block"
-            </summary>
-        </member>
-        <member name="P:NBitcoin.Protocol.RejectPayload.Reason">
-            <summary>
-            Details of the error
-            </summary>
-        </member>
-        <member name="P:NBitcoin.Protocol.RejectPayload.Hash">
-            <summary>
-            The hash being rejected
             </summary>
         </member>
         <member name="T:NBitcoin.Protocol.SendAddrV2Payload">
@@ -4574,11 +4871,6 @@
             "mempool" command, enhanced "getdata" behavior starts with this version
             </summary>
         </member>
-        <member name="P:NBitcoin.Protocol.ProtocolCapabilities.SupportReject">
-            <summary>
-            "reject" command
-            </summary>
-        </member>
         <member name="P:NBitcoin.Protocol.ProtocolCapabilities.SupportNodeBloom">
             <summary>
             ! "filter*" commands are disabled without NODE_BLOOM after and including this version
@@ -4622,6 +4914,11 @@
             Use this when you worry that your users do not support Bech address format.
             </summary>
         </member>
+        <member name="F:NBitcoin.ScriptPubKeyType.TaprootBIP86">
+            <summary>
+            Derive the taproot address of this pubkey following BIP86. This public key is used as the internal key, the output key is computed without script path. (The tweak is SHA256(internal_key))
+            </summary>
+        </member>
         <member name="M:NBitcoin.PubKey.#ctor(System.String)">
             <summary>
             Create a new Public key from string
@@ -4631,59 +4928,13 @@
             <summary>
             Create a new Public key from byte array
             </summary>
-        </member>
-        <member name="M:NBitcoin.PubKey.#ctor(System.Byte[],System.Boolean)">
-            <summary>
-            Create a new Public key from byte array
-            </summary>
             <param name="bytes">byte array</param>
-            <param name="unsafe">If false, make internal copy of bytes and does perform only a costly check for PubKey format. If true, the bytes array is used as is and only PubKey.Check is used for validating the format. </param>	 
         </member>
-        <member name="M:NBitcoin.PubKey.Check(System.Byte[],System.Boolean)">
+        <member name="M:NBitcoin.PubKey.SanityCheck(System.Byte[])">
             <summary>
-            Check on public key format.
+            Quick sanity check on public key format. (size + first byte)
             </summary>
             <param name="data">bytes array</param>
-            <param name="deep">If false, will only check the first byte and length of the array. If true, will also check that the ECC coordinates are correct.</param>
-            <returns>true if byte array is valid</returns>
-        </member>
-        <member name="M:NBitcoin.PubKey.VerifyMessage(System.String,System.String)">
-            <summary>
-            Verify message signed using signmessage from bitcoincore
-            </summary>
-            <param name="message">The message</param>
-            <param name="signature">The signature</param>
-            <returns>True if signatures is valid</returns>
-        </member>
-        <member name="M:NBitcoin.PubKey.VerifyMessage(System.Byte[],System.String)">
-            <summary>
-            Verify message signed using signmessage from bitcoincore
-            </summary>
-            <param name="message">The message</param>
-            <param name="signature">The signature</param>
-            <returns>True if signatures is valid</returns>
-        </member>
-        <member name="M:NBitcoin.PubKey.VerifyMessage(System.Byte[],NBitcoin.Crypto.ECDSASignature)">
-            <summary>
-            Verify message signed using signmessage from bitcoincore
-            </summary>
-            <param name="message">The message</param>
-            <param name="signature">The signature</param>
-            <returns>True if signatures is valid</returns>
-        </member>
-        <member name="M:NBitcoin.PubKey.DecodeSigString(System.String)">
-            <summary>
-            Decode signature from bitcoincore verify/signing rpc methods
-            </summary>
-            <param name="signature"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.PubKey.GetSharedSecret(NBitcoin.Key)">
-            <summary>
-            Exchange shared secret through ECDH
-            </summary>
-            <param name="key">Private key</param>
-            <returns>Shared secret</returns>
         </member>
         <member name="M:NBitcoin.PubKey.GetSharedPubkey(NBitcoin.Key)">
             <summary>
@@ -4691,12 +4942,6 @@
             </summary>
             <param name="key">Private key</param>
             <returns>Shared pubkey</returns>
-        </member>
-        <member name="M:NBitcoin.QBitNinjaTransactionRepository.#ctor(NBitcoin.Network)">
-            <summary>
-            Use qbitninja public servers
-            </summary>
-            <param name="network"></param>
         </member>
         <member name="T:NBitcoin.RPC.GetBlockVerbosity">
             <summary>
@@ -4809,7 +5054,7 @@
             <exception cref="T:System.ArgumentNullException">Null rest API endpoint</exception>
             <exception cref="T:System.ArgumentException">Invalid value for RestResponseFormat</exception>
         </member>
-        <member name="M:NBitcoin.RPC.RestClient.GetBlockAsync(NBitcoin.uint256)">
+        <member name="M:NBitcoin.RPC.RestClient.GetBlockAsync(NBitcoin.uint256,System.Threading.CancellationToken)">
             <summary>
             Gets the block.
             </summary>
@@ -4887,7 +5132,7 @@
             The RPC Capabilities of this RPCClient instance, this property will be set by a call to ScanRPCCapabilitiesAsync
             </summary>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.ScanRPCCapabilitiesAsync">
+        <member name="M:NBitcoin.RPC.RPCClient.ScanRPCCapabilitiesAsync(System.Threading.CancellationToken)">
             <summary>
             Run several RPC function to scan the RPC capabilities, then set RPCClient.Capabilities
             </summary>
@@ -4915,14 +5160,6 @@
             <param name="address"></param>
             <param name="network"></param>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.SendCommand(System.String,System.Object[])">
-            <summary>
-            Send a command
-            </summary>
-            <param name="commandName">https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list</param>
-            <param name="parameters"></param>
-            <returns></returns>
-        </member>
         <member name="M:NBitcoin.RPC.RPCClient.SendBatch">
             <summary>
             Send all commands in one batch
@@ -4938,26 +5175,12 @@
             Returns the total uptime of the server.
             </summary>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.UptimeAsync">
+        <member name="M:NBitcoin.RPC.RPCClient.UptimeAsync(System.Threading.CancellationToken)">
             <summary>
             Returns the total uptime of the server.
             </summary>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.StartScanTxoutSetAsync(NBitcoin.RPC.ScanTxoutSetObject[])">
-            <summary>
-            Scans the unspent transaction output set for entries that match certain output descriptors.
-            </summary>
-            <param name="descriptorObjects"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.RPCClient.StartScanTxoutSet(NBitcoin.RPC.ScanTxoutSetObject[])">
-            <summary>
-            Scans the unspent transaction output set for entries that match certain output descriptors.
-            </summary>
-            <param name="descriptorObjects"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.RPCClient.GetStatusScanTxoutSetAsync">
+        <member name="M:NBitcoin.RPC.RPCClient.GetStatusScanTxoutSetAsync(System.Threading.CancellationToken)">
             <summary>
             Get the progress report (in %) of the current scan
             </summary>
@@ -4969,7 +5192,7 @@
             </summary>
             <returns>The progress in %</returns>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.AbortScanTxoutSetAsync">
+        <member name="M:NBitcoin.RPC.RPCClient.AbortScanTxoutSetAsync(System.Threading.CancellationToken)">
             <summary>
             Aborting the current scan
             </summary>
@@ -4981,7 +5204,7 @@
             </summary>
             <returns>Returns true when abort was successful</returns>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.SendBatchAsync">
+        <member name="M:NBitcoin.RPC.RPCClient.SendBatchAsync(System.Threading.CancellationToken)">
             <summary>
             Send all commands in one batch
             </summary>
@@ -4999,7 +5222,7 @@
              may nevertheless have succeed without Bitcoin Core giving a clue about which one.
              </summary>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.GetBlockAsync(NBitcoin.uint256)">
+        <member name="M:NBitcoin.RPC.RPCClient.GetBlockAsync(NBitcoin.uint256,System.Threading.CancellationToken)">
             <summary>
             Get the a whole block
             </summary>
@@ -5019,7 +5242,7 @@
             </summary>
             <param name="blockHash">The hash of the block.</param>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.GetBlockFilterAsync(NBitcoin.uint256)">
+        <member name="M:NBitcoin.RPC.RPCClient.GetBlockFilterAsync(NBitcoin.uint256,System.Threading.CancellationToken)">
             <summary>
             Retrieve a BIP 157 content filter for a particular block.
             </summary>
@@ -5034,7 +5257,7 @@
             <param name="includeMempool">Whether to include the mempool. Note that an unspent output that is spent in the mempool won't appear.</param>
             <returns>null if spent or never existed</returns>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.GetTxOutAsync(NBitcoin.uint256,System.Int32,System.Boolean)">
+        <member name="M:NBitcoin.RPC.RPCClient.GetTxOutAsync(NBitcoin.uint256,System.Int32,System.Boolean,System.Threading.CancellationToken)">
             <summary>
             Returns details about an unspent transaction output.
             </summary>
@@ -5049,11 +5272,12 @@
             </summary>
             <returns>Parsed object containing all info</returns>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.GetTransactions(NBitcoin.uint256)">
+        <member name="M:NBitcoin.RPC.RPCClient.GetTransactions(NBitcoin.uint256,System.Threading.CancellationToken)">
             <summary>
             GetTransactions only returns on txn which are not entirely spent unless you run bitcoinq with txindex=1.
             </summary>
             <param name="blockHash"></param>
+            <param name="cancellationToken"></param>
             <returns></returns>
         </member>
         <member name="M:NBitcoin.RPC.RPCClient.GetRawTransaction(NBitcoin.uint256,System.Boolean)">
@@ -5073,7 +5297,7 @@
             <returns>The estimated fee rate, block number where estimate was found</returns>
             <exception cref="T:NBitcoin.RPC.NoEstimationException">The Fee rate couldn't be estimated because of insufficient data from Bitcoin Core</exception>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.TryEstimateSmartFeeAsync(System.Int32,NBitcoin.RPC.EstimateSmartFeeMode)">
+        <member name="M:NBitcoin.RPC.RPCClient.TryEstimateSmartFeeAsync(System.Int32,NBitcoin.RPC.EstimateSmartFeeMode,System.Threading.CancellationToken)">
             <summary>
             (>= Bitcoin Core v0.14) Tries to get the estimated fee per kb for being confirmed in nblock
             If Capabilities is set and estimatesmartfee is not supported, will fallback on estimatefee
@@ -5091,7 +5315,7 @@
             <param name="estimateMode">Whether to return a more conservative estimate which also satisfies a longer history. A conservative estimate potentially returns a higher feerate and is more likely to be sufficient for the desired target, but is not as responsive to short term drops in the prevailing fee market.</param>
             <returns>The estimated fee rate, block number where estimate was found or null</returns>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.EstimateSmartFeeAsync(System.Int32,NBitcoin.RPC.EstimateSmartFeeMode)">
+        <member name="M:NBitcoin.RPC.RPCClient.EstimateSmartFeeAsync(System.Int32,NBitcoin.RPC.EstimateSmartFeeMode,System.Threading.CancellationToken)">
             <summary>
             (>= Bitcoin Core v0.14) Get the estimated fee per kb for being confirmed in nblock
             If Capabilities is set and estimatesmartfee is not supported, will fallback on estimatefee
@@ -5101,66 +5325,95 @@
             <returns>The estimated fee rate, block number where estimate was found</returns>
             <exception cref="T:NBitcoin.RPC.NoEstimationException">when fee couldn't be estimated</exception>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.EstimateSmartFeeImplAsync(System.Int32,NBitcoin.RPC.EstimateSmartFeeMode)">
+        <member name="M:NBitcoin.RPC.RPCClient.EstimateSmartFeeImplAsync(System.Int32,NBitcoin.RPC.EstimateSmartFeeMode,System.Threading.CancellationToken)">
             <summary>
             (>= Bitcoin Core v0.14)
             </summary>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.SendToAddress(NBitcoin.BitcoinAddress,NBitcoin.Money,System.String,System.String,System.Boolean,System.Boolean)">
+        <member name="M:NBitcoin.RPC.RPCClient.SendToAddress(NBitcoin.BitcoinAddress,NBitcoin.Money,NBitcoin.RPC.SendToAddressParameters,System.Threading.CancellationToken)">
             <summary>
             Requires wallet support. Requires an unlocked wallet or an unencrypted wallet.
             </summary>
             <param name="address">A P2PKH or P2SH address to which the bitcoins should be sent</param>
             <param name="amount">The amount to spend</param>
-            <param name="commentTx">A locally-stored (not broadcast) comment assigned to this transaction. Default is no comment</param>
-            <param name="commentDest">A locally-stored (not broadcast) comment assigned to this transaction. Meant to be used for describing who the payment was sent to. Default is no comment</param>
-            <param name="subtractFeeFromAmount">The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field. </param>
-            <param name="replaceable">Allow this transaction to be replaced by a transaction with higher fees. </param>
+            <param name="parameters"></param>
+            <param name="cancellationToken"></param>
             <returns>The TXID of the sent transaction</returns>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.SendToAddress(NBitcoin.Script,NBitcoin.Money,System.String,System.String,System.Boolean,System.Boolean)">
-            <summary>
-            Requires wallet support. Requires an unlocked wallet or an unencrypted wallet.
-            </summary>
-            <param name="scriptPubKey">The destination where coins should be sent</param>
-            <param name="amount">The amount to spend</param>
-            <param name="commentTx">A locally-stored (not broadcast) comment assigned to this transaction. Default is no comment</param>
-            <param name="commentDest">A locally-stored (not broadcast) comment assigned to this transaction. Meant to be used for describing who the payment was sent to. Default is no comment</param>
-            <param name="subtractFeeFromAmount">The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field. </param>
-            <param name="replaceable">Allow this transaction to be replaced by a transaction with higher fees. </param>
-            <returns>The TXID of the sent transaction</returns>
-        </member>
-        <member name="M:NBitcoin.RPC.RPCClient.SendToAddressAsync(NBitcoin.Script,NBitcoin.Money,System.String,System.String,System.Boolean,System.Boolean)">
-            <summary>
-            Requires wallet support. Requires an unlocked wallet or an unencrypted wallet.
-            </summary>
-            <param name="scriptPubKey">The destination where coins should be sent</param>
-            <param name="amount">The amount to spend</param>
-            <param name="commentTx">A locally-stored (not broadcast) comment assigned to this transaction. Default is no comment</param>
-            <param name="commentDest">A locally-stored (not broadcast) comment assigned to this transaction. Meant to be used for describing who the payment was sent to. Default is no comment</param>
-            <param name="subtractFeeFromAmount">The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field. </param>
-            <param name="replaceable">Allow this transaction to be replaced by a transaction with higher fees. </param>
-            <returns>The TXID of the sent transaction</returns>
-        </member>
-        <member name="M:NBitcoin.RPC.RPCClient.SendToAddressAsync(NBitcoin.BitcoinAddress,NBitcoin.Money,System.String,System.String,System.Boolean,System.Boolean)">
+        <member name="M:NBitcoin.RPC.RPCClient.SendToAddress(NBitcoin.BitcoinAddress,NBitcoin.Money,System.Threading.CancellationToken)">
             <summary>
             Requires wallet support. Requires an unlocked wallet or an unencrypted wallet.
             </summary>
             <param name="address">A P2PKH or P2SH address to which the bitcoins should be sent</param>
             <param name="amount">The amount to spend</param>
-            <param name="commentTx">A locally-stored (not broadcast) comment assigned to this transaction. Default is no comment</param>
-            <param name="commentDest">A locally-stored (not broadcast) comment assigned to this transaction. Meant to be used for describing who the payment was sent to. Default is no comment</param>
-            <param name="subtractFeeFromAmount">The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field. </param>
-            <param name="replaceable">Allow this transaction to be replaced by a transaction with higher fees. </param>
+            <param name="cancellationToken"></param>
             <returns>The TXID of the sent transaction</returns>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.InvalidateBlock(NBitcoin.uint256)">
+        <member name="M:NBitcoin.RPC.RPCClient.SendToAddress(NBitcoin.Script,NBitcoin.Money,System.Threading.CancellationToken)">
+            <summary>
+            Requires wallet support. Requires an unlocked wallet or an unencrypted wallet.
+            </summary>
+            <param name="address">A P2PKH or P2SH address to which the bitcoins should be sent</param>
+            <param name="amount">The amount to spend</param>
+            <param name="cancellationToken"></param>
+            <returns>The TXID of the sent transaction</returns>
+        </member>
+        <member name="M:NBitcoin.RPC.RPCClient.SendToAddressAsync(NBitcoin.Script,NBitcoin.Money,NBitcoin.RPC.SendToAddressParameters,System.Threading.CancellationToken)">
+            <summary>
+            Requires wallet support. Requires an unlocked wallet or an unencrypted wallet.
+            </summary>
+            <param name="address">A P2PKH or P2SH address to which the bitcoins should be sent</param>
+            <param name="amount">The amount to spend</param>
+            <param name="parameters"></param>
+            <param name="cancellationToken"></param>
+            <returns>The TXID of the sent transaction</returns>
+        </member>
+        <member name="M:NBitcoin.RPC.RPCClient.SendToAddressAsync(NBitcoin.Script,NBitcoin.Money,System.Threading.CancellationToken)">
+            <summary>
+            Requires wallet support. Requires an unlocked wallet or an unencrypted wallet.
+            </summary>
+            <param name="scriptPubKey">The scriptPubKey where the bitcoins should be sent</param>
+            <param name="amount">The amount to spend</param>
+            <param name="cancellationToken"></param>
+            <returns>The TXID of the sent transaction</returns>
+        </member>
+        <member name="M:NBitcoin.RPC.RPCClient.SendToAddress(NBitcoin.Script,NBitcoin.Money,NBitcoin.RPC.SendToAddressParameters,System.Threading.CancellationToken)">
+            <summary>
+            Requires wallet support. Requires an unlocked wallet or an unencrypted wallet.
+            </summary>
+            <param name="scriptPubKey">The scriptPubKey where the bitcoins should be sent</param>
+            <param name="amount">The amount to spend</param>
+            <param name="parameters"></param>
+            <param name="cancellationToken"></param>
+            <returns>The TXID of the sent transaction</returns>
+        </member>
+        <member name="M:NBitcoin.RPC.RPCClient.SendToAddressAsync(NBitcoin.BitcoinAddress,NBitcoin.Money,System.Threading.CancellationToken)">
+            <summary>
+            Requires wallet support. Requires an unlocked wallet or an unencrypted wallet.
+            </summary>
+            <param name="address">A P2PKH or P2SH address to which the bitcoins should be sent</param>
+            <param name="amount">The amount to spend</param>
+            <param name="cancellationToken"></param>
+            <returns>The TXID of the sent transaction</returns>
+        </member>
+        <member name="M:NBitcoin.RPC.RPCClient.SendToAddressAsync(NBitcoin.BitcoinAddress,NBitcoin.Money,NBitcoin.RPC.SendToAddressParameters,System.Threading.CancellationToken)">
+            <summary>
+            Requires wallet support. Requires an unlocked wallet or an unencrypted wallet.
+            </summary>
+            <param name="address">A P2PKH or P2SH address to which the bitcoins should be sent</param>
+            <param name="amount">The amount to spend</param>
+            <param name="parameters"></param>
+            <param name="cancellationToken"></param>
+            <returns>The TXID of the sent transaction</returns>
+        </member>
+        <member name="M:NBitcoin.RPC.RPCClient.InvalidateBlock(NBitcoin.uint256,System.Threading.CancellationToken)">
             <summary>
             Permanently marks a block as invalid, as if it violated a consensus rule.
             </summary>
             <param name="blockhash">the hash of the block to mark as invalid</param>
+            <param name="cancellationToken"></param>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.InvalidateBlockAsync(NBitcoin.uint256)">
+        <member name="M:NBitcoin.RPC.RPCClient.InvalidateBlockAsync(NBitcoin.uint256,System.Threading.CancellationToken)">
             <summary>
             Permanently marks a block as invalid, as if it violated a consensus rule.
             </summary>
@@ -5171,7 +5424,7 @@
             Add the address of a potential peer to the address manager. This RPC is for testing only.
             </summary>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.AddPeerAddressAsync(System.Net.IPAddress,System.Int32)">
+        <member name="M:NBitcoin.RPC.RPCClient.AddPeerAddressAsync(System.Net.IPAddress,System.Int32,System.Threading.CancellationToken)">
             <summary>
             Add the address of a potential peer to the address manager. This RPC is for testing only.
             </summary>
@@ -5227,7 +5480,7 @@
             </param>
             <returns>The number of bitcoins received by the address, excluding coinbase transactions. May be 0.</returns>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.ImportMultiAsync(NBitcoin.RPC.ImportMultiAddress[],System.Boolean,NBitcoin.ISigningRepository)">
+        <member name="M:NBitcoin.RPC.RPCClient.ImportMultiAsync(NBitcoin.RPC.ImportMultiAddress[],System.Boolean,NBitcoin.ISigningRepository,System.Threading.CancellationToken)">
              <summary>
             
              </summary>
@@ -5236,48 +5489,6 @@
              <param name="signingRepository">If you specify this, This method tries to serialize OutputDescriptor with the private key (If there is any entry in the repository).</param>
              <returns></returns>
              <exception cref="T:NBitcoin.RPC.RPCException"></exception>
-        </member>
-        <member name="M:NBitcoin.RPC.RPCClient.ListAccounts">
-            <summary>
-            Lists accounts and their balances, with the default number of confirmations for balances (1),
-            and not including watch only addresses (default false).
-            </summary>
-        </member>
-        <member name="M:NBitcoin.RPC.RPCClient.ListAccounts(System.Int32)">
-            <summary>
-            Lists accounts and their balances, based on the specified number of confirmations.
-            </summary>
-            <param name="confirmations">
-            The minimum number of confirmations an externally-generated transaction must have before
-            it is counted towards the balance. Transactions generated by this node are counted immediately.
-            Typically, externally-generated transactions are payments to this wallet and transactions
-            generated by this node are payments to other wallets. Use 0 to count unconfirmed transactions.
-            Default is 1.
-            </param>
-            <returns>
-            A list of accounts and their balances.
-            </returns>
-        </member>
-        <member name="M:NBitcoin.RPC.RPCClient.ListAccounts(System.Int32,System.Boolean)">
-            <summary>
-            Lists accounts and their balances, based on the specified number of confirmations,
-            and including watch only accounts if specified. (Added in Bitcoin Core 0.10.0)
-            </summary>
-            <param name="confirmations">
-            The minimum number of confirmations an externally-generated transaction must have before
-            it is counted towards the balance. Transactions generated by this node are counted immediately.
-            Typically, externally-generated transactions are payments to this wallet and transactions
-            generated by this node are payments to other wallets. Use 0 to count unconfirmed transactions.
-            Default is 1.
-            </param>
-            <param name="includeWatchOnly">
-            If set to true, include watch-only addresses in details and calculations as if they were
-            regular addresses belonging to the wallet. If set to false (the default), treat watch-only
-            addresses as if they didn’t belong to this wallet.
-            </param>
-            <returns>
-            A list of accounts and their balances.
-            </returns>
         </member>
         <member name="M:NBitcoin.RPC.RPCClient.ListUnspent">
             <summary>
@@ -5370,7 +5581,7 @@
             <param name="request">The transaction to be signed</param>
             <returns>The signed transaction</returns>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.SignRawTransactionWithKeyAsync(NBitcoin.RPC.SignRawTransactionWithKeyRequest)">
+        <member name="M:NBitcoin.RPC.RPCClient.SignRawTransactionWithKeyAsync(NBitcoin.RPC.SignRawTransactionWithKeyRequest,System.Threading.CancellationToken)">
             <summary>
             Sign a transaction
             </summary>
@@ -5384,7 +5595,7 @@
             <param name="request">The transaction to be signed</param>
             <returns>The signed transaction</returns>
         </member>
-        <member name="M:NBitcoin.RPC.RPCClient.SignRawTransactionWithWalletAsync(NBitcoin.RPC.SignRawTransactionRequest)">
+        <member name="M:NBitcoin.RPC.RPCClient.SignRawTransactionWithWalletAsync(NBitcoin.RPC.SignRawTransactionRequest,System.Threading.CancellationToken)">
             <summary>
             Sign a transaction with wallet keys
             </summary>
@@ -5464,6 +5675,41 @@
         <member name="P:NBitcoin.RPC.MempoolEntry.SpentBy">
             <summary>
             Unconfirmed transactions spending outputs from this transaction.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.RPC.SendToAddressParameters.Comment">
+            <summary>
+            A locally-stored (not broadcast) comment assigned to this transaction. Default is no comment.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.RPC.SendToAddressParameters.CommentTo">
+            <summary>
+            A locally-stored (not broadcast) comment assigned to this transaction. Meant to be used for describing who the payment was sent to. Default is no comment.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.RPC.SendToAddressParameters.SubstractFeeFromAmount">
+            <summary>
+            The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field. Default is false.
+            </summary>
+        </member>
+        <member name="P:NBitcoin.RPC.SendToAddressParameters.Replaceable">
+            <summary>
+            Allow this transaction to be replaced by a transaction with higher fees. 
+            </summary>
+        </member>
+        <member name="P:NBitcoin.RPC.SendToAddressParameters.ConfTarget">
+            <summary>
+            Confirmation target in blocks
+            </summary>
+        </member>
+        <member name="P:NBitcoin.RPC.SendToAddressParameters.EstimateMode">
+            <summary>
+            The fee estimate mode
+            </summary>
+        </member>
+        <member name="P:NBitcoin.RPC.SendToAddressParameters.FeeRate">
+            <summary>
+            Specify a fee rate in sat/vB.
             </summary>
         </member>
         <member name="P:NBitcoin.RPC.RPCCredentialString.UseDefault">
@@ -5664,108 +5910,15 @@
             No wallet specified (error when there are multiple wallets loaded)
             </summary>
         </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutPubkey.PrivateKey(NBitcoin.BitcoinSecret)">
+        <member name="P:NBitcoin.RPC.ScanTxoutDescriptor.Begin">
             <summary>
-             Describe public key of this private key
+            The range of HD chain indexes to explore
             </summary>
-            <param name="key"></param>
-            <returns></returns>
         </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutPubkey.PrivateKey(NBitcoin.Key,NBitcoin.Network)">
+        <member name="P:NBitcoin.RPC.ScanTxoutDescriptor.End">
             <summary>
-             Describe public key of this private key
+            The range of HD chain indexes to explore
             </summary>
-            <param name="key"></param>
-            <param name="network"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutPubkey.PublicKey(NBitcoin.PubKey)">
-            <summary>
-             Describe public key
-            </summary>
-            <param name="publicKey"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutPubkey.ExtPubKey(NBitcoin.BitcoinExtPubKey,NBitcoin.KeyPath)">
-            <summary>
-             Describe ext public key
-            </summary>
-            <param name="extPubKey"></param>
-            <param name="keyPath">The root of the keypath to follow</param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutPubkey.ExtPubKey(NBitcoin.ExtPubKey,NBitcoin.Network,NBitcoin.KeyPath)">
-            <summary>
-             Describe ext public key
-            </summary>
-            <param name="extPubKey"></param>
-            <param name="network"></param>
-            <param name="keyPath">The root of the keypath to follow</param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutDescriptor.PK(NBitcoin.RPC.ScanTxoutPubkey)">
-            <summary>
-             Pay-to-pubkey (P2PK) output for public key P
-            </summary>
-            <param name="pubkey"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutDescriptor.PKH(NBitcoin.RPC.ScanTxoutPubkey)">
-            <summary>
-            Pay-to-pubkey-hash (P2PKH) output for public key P.
-            </summary>
-            <param name="pubkey"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutDescriptor.WPKH(NBitcoin.RPC.ScanTxoutPubkey)">
-            <summary>
-            Pay-to-witness-pubkey-hash (P2WPKH) output for public key P.
-            </summary>
-            <param name="pubkey"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutDescriptor.SH(NBitcoin.RPC.ScanTxoutDescriptor)">
-            <summary>
-            Pay-to-script-hash (P2SH) output for script S
-            </summary>
-            <param name="descriptor"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutDescriptor.WSH(NBitcoin.RPC.ScanTxoutDescriptor)">
-            <summary>
-            Pay-to-witness-script-hash (P2WSH) output for script S
-            </summary>
-            <param name="descriptor"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutDescriptor.Combo(NBitcoin.RPC.ScanTxoutPubkey)">
-            <summary>
-            Combination of P2PK, P2PKH, P2WPKH, and P2SH-P2WPKH for public key P.
-            </summary>
-            <param name="descriptor"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutDescriptor.Multi(System.Int32,NBitcoin.RPC.ScanTxoutPubkey[])">
-            <summary>
-            k-of-n multisig for given public keys
-            </summary>
-            <param name="k">k from the "k-of-n multisig" for given public keys</param>
-            <param name="pubkeys"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutDescriptor.Addr(NBitcoin.BitcoinAddress)">
-            <summary>
-            Output to address
-            </summary>
-            <param name="address"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.RPC.ScanTxoutDescriptor.Raw(NBitcoin.Script)">
-            <summary>
-            scriptPubKey with raw bytes
-            </summary>
-            <param name="scriptPubKey"></param>
-            <returns></returns>
         </member>
         <member name="P:NBitcoin.RPC.SignRawTransactionRequest.PrevTx.RedeemScript">
             <summary>
@@ -5923,6 +6076,12 @@
             Some altcoins like BCash and BGold requires ForkId inside the sigHash
             </summary>
         </member>
+        <!-- Badly formed XML comment ignored for member "F:NBitcoin.ScriptVerify.Taproot" -->
+        <member name="F:NBitcoin.ScriptVerify.DiscourageUpgradableTaprootVersion">
+            <summary>
+            Making unknown Taproot leaf versions non-standard
+            </summary>
+        </member>
         <member name="F:NBitcoin.ScriptVerify.Mandatory">
              <summary>
              Mandatory script verification flags that all new blocks must comply with for
@@ -5972,9 +6131,44 @@
             If set, no inputs, except this, are part of the signature
             </summary>
         </member>
+        <member name="T:NBitcoin.TaprootSigHash">
+            <summary>
+            Signature hash types/flags for taproot transactions
+            </summary>
+        </member>
+        <member name="F:NBitcoin.TaprootSigHash.All">
+            <summary>
+            All outputs are signed
+            </summary>
+        </member>
+        <member name="F:NBitcoin.TaprootSigHash.None">
+            <summary>
+            No outputs as signed
+            </summary>
+        </member>
+        <member name="F:NBitcoin.TaprootSigHash.Single">
+            <summary>
+            Only the output with the same index as this input is signed
+            </summary>
+        </member>
+        <member name="F:NBitcoin.TaprootSigHash.AnyoneCanPay">
+            <summary>
+            If set, no inputs, except this, are part of the signature
+            </summary>
+        </member>
         <member name="T:NBitcoin.OpcodeType">
             <summary>
             Script opcodes
+            </summary>
+        </member>
+        <member name="F:NBitcoin.HashVersion.Taproot">
+            <summary>
+            Key spend
+            </summary>
+        </member>
+        <member name="F:NBitcoin.HashVersion.Tapscript">
+            <summary>
+            Script spend
             </summary>
         </member>
         <member name="M:NBitcoin.Script.ExtractScriptCode(System.Int32)">
@@ -5987,11 +6181,6 @@
         <member name="P:NBitcoin.Script.PaymentScript">
             <summary>
             Get the P2SH scriptPubKey of this script
-            </summary>
-        </member>
-        <member name="P:NBitcoin.Script.IsWitness">
-            <summary>
-            True if the scriptPubKey is witness
             </summary>
         </member>
         <member name="M:NBitcoin.Script.GetSignerAddress(NBitcoin.Network)">
@@ -6009,14 +6198,14 @@
         </member>
         <member name="M:NBitcoin.Script.GetDestinationAddress(NBitcoin.Network)">
             <summary>
-            Extract P2SH/P2PKH/P2WSH/P2WPKH address from scriptPubKey
+            Extract P2SH/P2PKH/P2WSH/P2WPKH/P2TR address from scriptPubKey
             </summary>
             <param name="network"></param>
             <returns></returns>
         </member>
         <member name="M:NBitcoin.Script.GetDestination">
             <summary>
-            Extract P2SH/P2PKH/P2WSH/P2WPKH id from scriptPubKey
+            Extract P2SH/P2PKH/P2WSH/P2WPKH/P2TR id from scriptPubKey
             </summary>
             <param name="network"></param>
             <returns></returns>
@@ -6028,23 +6217,10 @@
             <param name="network"></param>
             <returns></returns>
         </member>
-        <member name="M:NBitcoin.Script.ToRawScript">
-            <summary>
-            Get script byte array
-            </summary>
-            <returns></returns>
-        </member>
         <member name="M:NBitcoin.Script.ToBytes">
             <summary>
             Get script byte array
             </summary>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.Script.ToRawScript(System.Boolean)">
-            <summary>
-            Get script byte array
-            </summary>
-            <param name="unsafe">if false, returns a copy of the internal byte array</param>
             <returns></returns>
         </member>
         <member name="M:NBitcoin.Script.ToBytes(System.Boolean)">
@@ -6411,7 +6587,7 @@
             <param name="apply"></param>
             <returns></returns>
         </member>
-        <member name="M:NBitcoin.Scripting.Parser.ParserExtension.TryParse``1(NBitcoin.Scripting.Parser.Parser{System.Char,``0},System.String)">
+        <member name="M:NBitcoin.Scripting.Parser.ParserExtension.TryParse``1(NBitcoin.Scripting.Parser.Parser{System.Char,``0},System.String,NBitcoin.Network)">
             <summary>
             Tries to parse the input without throwing an exception.
             </summary>
@@ -6420,7 +6596,7 @@
             <param name="input">The input.</param>
             <returns>The result of the parser</returns>
         </member>
-        <member name="M:NBitcoin.Scripting.Parser.ParserExtension.Parse``1(NBitcoin.Scripting.Parser.Parser{System.Char,``0},System.String)">
+        <member name="M:NBitcoin.Scripting.Parser.ParserExtension.Parse``1(NBitcoin.Scripting.Parser.Parser{System.Char,``0},System.String,NBitcoin.Network)">
             <summary>
             Parses the specified input string.
             </summary>
@@ -6617,39 +6793,6 @@
             </summary>
             <returns>True if P2WSH</returns>
         </member>
-        <member name="M:NBitcoin.Stealth.BitcoinStealthAddress.GetPayments(NBitcoin.Transaction,NBitcoin.Key)">
-            <summary>
-            Scan the Transaction for StealthCoin given address and scan key
-            </summary>
-            <param name="tx">The transaction to scan</param>
-            <param name="address">The stealth address</param>
-            <param name="scan">The scan private key</param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.Stealth.BitcoinStealthAddress.GetPayments(NBitcoin.Transaction,NBitcoin.ISecret)">
-            <summary>
-            Scan the Transaction for StealthCoin given address and scan key
-            </summary>
-            <param name="tx">The transaction to scan</param>
-            <param name="address">The stealth address</param>
-            <param name="scan">The scan private key</param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.Stealth.BitcoinStealthAddress.CreatePayment(NBitcoin.Key)">
-            <summary>
-            Prepare a stealth payment 
-            </summary>
-            <param name="ephemKey">Ephem Key</param>
-            <returns>Stealth Payment</returns>
-        </member>
-        <member name="M:NBitcoin.Stealth.BitcoinStealthAddress.SendTo(NBitcoin.Transaction,NBitcoin.Money,NBitcoin.Key)">
-            <summary>
-            Add a stealth payment to the transaction
-            </summary>
-            <param name="transaction">Destination transaction</param>
-            <param name="value">Money to send</param>
-            <param name="ephemKey">Ephem Key</param>
-        </member>
         <member name="T:NBitcoin.Target">
             <summary>
             Represent the challenge that miners must solve for finding a new block
@@ -6698,6 +6841,13 @@
             </summary>
             <param name="outpoint">The outpoint being searched for</param>
             <returns>The IndexedTxIn which PrevOut is equal to <paramref name="outpoint"/> or null if not found</returns>
+        </member>
+        <member name="M:NBitcoin.TxInList.FindIndexedInput(System.Int32)">
+            <summary>
+            Returns the IndexedTxIn at index.
+            </summary>
+            <param name="index">the index</param>
+            <returns>A IndexedTxIn</returns>
         </member>
         <member name="M:NBitcoin.WitScript.#ctor(System.Byte[][],System.Boolean)">
             <summary>
@@ -6751,6 +6901,13 @@
             Calculate the fee of the transaction
             </summary>
             <param name="spentCoins">Coins being spent</param>
+            <returns>Fee or null if some spent coins are missing or if spentCoins is null</returns>
+        </member>
+        <member name="M:NBitcoin.Transaction.GetFee(NBitcoin.TxOut[])">
+            <summary>
+            Calculate the fee of the transaction
+            </summary>
+            <param name="spentOutputs">Outputs being spent</param>
             <returns>Fee or null if some spent coins are missing or if spentCoins is null</returns>
         </member>
         <member name="M:NBitcoin.Transaction.GetFeeRate(NBitcoin.ICoin[])">
@@ -6812,9 +6969,23 @@
             What are we signing (default: SigHash.All)
             </summary>
         </member>
+        <member name="P:NBitcoin.SigningOptions.TaprootSigHash">
+            <summary>
+            What are we signing for taproot (default: SigHash.Default)
+            </summary>
+        </member>
         <member name="P:NBitcoin.SigningOptions.EnforceLowR">
             <summary>
             Do we try to get shorter signatures? (default: true)
+            </summary>
+        </member>
+        <member name="P:NBitcoin.SigningOptions.PrecomputedTransactionData">
+            <summary>
+            Providing the PrecomputedTransactionData speed up signing time, by pre computing one several hashes need
+            for the calculation of the signatures of every input.
+            
+            For taproot transaction signing, the precomputed transaction data is required if some of the inputs does not
+            belong to the signer.
             </summary>
         </member>
         <member name="T:NBitcoin.DefaultCoinSelector">
@@ -6899,6 +7070,12 @@
             The minimum UTXO value to select
             </summary>
         </member>
+        <member name="P:NBitcoin.TransactionBuilder.BuilderGroup.SurrendedValue">
+            <summary>
+            Money which has been recovered from outputs that are too small to be included
+            we should be able to pay fees with that
+            </summary>
+        </member>
         <member name="P:NBitcoin.TransactionBuilder.ShuffleRandom">
             <summary>
             The random number generator used for shuffling transaction outputs or selected coins
@@ -6957,11 +7134,6 @@
             </summary>
             <param name="groupName">Name of the group</param>
             <returns></returns>
-        </member>
-        <member name="P:NBitcoin.TransactionBuilder.UseLowR">
-            <summary>
-            Do we try to get shorter signatures? (default: true)
-            </summary>
         </member>
         <member name="M:NBitcoin.TransactionBuilder.Send(NBitcoin.IDestination,NBitcoin.Money)">
             <summary>
@@ -7093,43 +7265,24 @@
             Build a PSBT (Partially signed bitcoin transaction)
             </summary>
             <param name="sign">True if signs all inputs with the available keys</param>
-            <returns>A PSBT</returns>
-            <exception cref="T:NBitcoin.NotEnoughFundsException">Not enough funds are available</exception>
-        </member>
-        <member name="M:NBitcoin.TransactionBuilder.BuildPSBT(System.Boolean,NBitcoin.SigHash)">
-            <summary>
-            Build a PSBT (Partially signed bitcoin transaction)
-            </summary>
-            <param name="sign">True if signs all inputs with the available keys</param>
             <param name="sigHash">The sighash for signing (ignored if sign is false)</param>
             <returns>A PSBT</returns>
             <exception cref="T:NBitcoin.NotEnoughFundsException">Not enough funds are available</exception>
         </member>
-        <member name="M:NBitcoin.TransactionBuilder.BuildPSBT(System.Boolean,NBitcoin.SigningOptions)">
-            <summary>
-            Build a PSBT (Partially signed bitcoin transaction)
-            </summary>
-            <param name="sign">True if signs all inputs with the available keys</param>
-            <param name="signingOptions">The signing options (ignored if sign is false)</param>
-            <returns>A PSBT</returns>
-            <exception cref="T:NBitcoin.NotEnoughFundsException">Not enough funds are available</exception>
-        </member>
-        <member name="M:NBitcoin.TransactionBuilder.CreatePSBTFrom(NBitcoin.Transaction,System.Boolean,NBitcoin.SigHash)">
+        <member name="M:NBitcoin.TransactionBuilder.CreatePSBTFrom(NBitcoin.Transaction,System.Boolean)">
             <summary>
             Create a PSBT from a transaction
             </summary>
             <param name="tx">The transaction</param>
             <param name="sign">If true, the transaction builder will sign this transaction</param>
-            <param name="sigHash">The sighash for signing (ignored if sign is false)</param>
             <returns></returns>
         </member>
-        <member name="M:NBitcoin.TransactionBuilder.CreatePSBTFrom(NBitcoin.Transaction,System.Boolean,NBitcoin.SigningOptions)">
+        <member name="M:NBitcoin.TransactionBuilder.ExtractSignatures(NBitcoin.PSBT,NBitcoin.Transaction)">
             <summary>
-            Create a PSBT from a transaction
+            Try to extract the signatures from <paramref name="transaction"/> into the <paramref name="psbt"/>.
             </summary>
-            <param name="tx">The transaction</param>
-            <param name="sign">If true, the transaction builder will sign this transaction</param>
-            <param name="signingOptions">The signing options (ignored if sign is false)</param>
+            <param name="psbt">The PSBT to extract signatures to.</param>
+            <param name="transaction">The transaction from which signatures will get extracted.</param>
             <returns></returns>
         </member>
         <member name="M:NBitcoin.TransactionBuilder.UpdatePSBT(NBitcoin.PSBT)">
@@ -7146,44 +7299,11 @@
             <returns>The transaction</returns>
             <exception cref="T:NBitcoin.NotEnoughFundsException">Not enough funds are available</exception>
         </member>
-        <member name="M:NBitcoin.TransactionBuilder.BuildTransaction(System.Boolean,NBitcoin.SigHash)">
-            <summary>
-            Build the transaction
-            </summary>
-            <param name="sign">True if signs all inputs with the available keys</param>
-            <param name="sigHash">The type of signature</param>
-            <returns>The transaction</returns>
-            <exception cref="T:NBitcoin.NotEnoughFundsException">Not enough funds are available</exception>
-        </member>
-        <member name="M:NBitcoin.TransactionBuilder.BuildTransaction(System.Boolean,NBitcoin.SigningOptions)">
-            <summary>
-            Build the transaction
-            </summary>
-            <param name="sign">True if signs all inputs with the available keys</param>
-            <param name="signingOptions">The signing options</param>
-            <returns>The transaction</returns>
-            <exception cref="T:NBitcoin.NotEnoughFundsException">Not enough funds are available</exception>
-        </member>
-        <member name="M:NBitcoin.TransactionBuilder.SignTransaction(NBitcoin.Transaction)">
-            <summary>
-            Clone the transaction passed as parameter and sign it
-            </summary>
-            <param name="transaction">The transaction</param>
-            <returns>The signed transaction</returns>
-        </member>
         <member name="M:NBitcoin.TransactionBuilder.SignTransactionInPlace(NBitcoin.Transaction)">
             <summary>
             Sign the transaction passed as parameter
             </summary>
             <param name="transaction">The transaction</param>
-            <returns>The transaction object as the one passed as parameter</returns>
-        </member>
-        <member name="M:NBitcoin.TransactionBuilder.SignTransactionInPlace(NBitcoin.Transaction,NBitcoin.SigningOptions)">
-            <summary>
-            Sign the transaction passed as parameter
-            </summary>
-            <param name="transaction">The transaction</param>
-            <param name="signingOptions">The signing options</param>
             <returns>The transaction object as the one passed as parameter</returns>
         </member>
         <member name="M:NBitcoin.TransactionBuilder.EstimateFeeRate(NBitcoin.Transaction)">
@@ -7194,14 +7314,6 @@
             <returns>The fee rate, or null if the transaction builder is missing previous coins</returns>
             <exception cref="T:NBitcoin.CoinNotFoundException">If the transaction builder is missing some coins</exception>
         </member>
-        <member name="M:NBitcoin.TransactionBuilder.SignTransactionInPlace(NBitcoin.Transaction,NBitcoin.SigHash)">
-            <summary>
-            Sign the transaction passed as parameter
-            </summary>
-            <param name="transaction">The transaction</param>
-            <param name="sigHash">The sighash to sign</param>
-            <returns>The transaction object as the one passed as parameter</returns>
-        </member>
         <member name="M:NBitcoin.TransactionBuilder.Verify(NBitcoin.Transaction)">
             <summary>
             Verify that a transaction is fully signed and have enough fees
@@ -7209,11 +7321,26 @@
             <param name="tx">The transaction to check</param>
             <returns>True if no error</returns>
         </member>
+        <member name="M:NBitcoin.TransactionBuilder.Verify(NBitcoin.TransactionValidator)">
+            <summary>
+            Verify that a transaction is fully signed and have enough fees
+            </summary>
+            <param name="validator">The transaction validator</param>
+            <returns>True if no error</returns>
+        </member>
         <member name="M:NBitcoin.TransactionBuilder.Verify(NBitcoin.Transaction,NBitcoin.Money)">
             <summary>
             Verify that a transaction is fully signed and have enough fees
             </summary>
             <param name="tx">The transaction to check</param>
+            <param name="expectedFees">The expected fees (more or less 10%)</param>
+            <returns>True if no error</returns>
+        </member>
+        <member name="M:NBitcoin.TransactionBuilder.Verify(NBitcoin.TransactionValidator,NBitcoin.Money)">
+            <summary>
+            Verify that a transaction is fully signed and have enough fees
+            </summary>
+            <param name="validator">The transaction validator</param>
             <param name="expectedFees">The expected fees (more or less 10%)</param>
             <returns>True if no error</returns>
         </member>
@@ -7225,11 +7352,27 @@
             <param name="expectedFeeRate">The expected fee rate</param>
             <returns>True if no error</returns>
         </member>
+        <member name="M:NBitcoin.TransactionBuilder.Verify(NBitcoin.TransactionValidator,NBitcoin.FeeRate)">
+            <summary>
+            Verify that a transaction is fully signed and have enough fees
+            </summary>
+            <param name="validator">The transaction validator</param>
+            <param name="expectedFeeRate">The expected fee rate</param>
+            <returns>True if no error</returns>
+        </member>
         <member name="M:NBitcoin.TransactionBuilder.Verify(NBitcoin.Transaction,NBitcoin.Policy.TransactionPolicyError[]@)">
             <summary>
             Verify that a transaction is fully signed and have enough fees
             </summary>
             <param name="tx">The transaction to check</param>
+            <param name="errors">Detected errors</param>
+            <returns>True if no error</returns>
+        </member>
+        <member name="M:NBitcoin.TransactionBuilder.Verify(NBitcoin.TransactionValidator,NBitcoin.Policy.TransactionPolicyError[]@)">
+            <summary>
+            Verify that a transaction is fully signed and have enough fees
+            </summary>
+            <param name="validator">The transaction validator</param>
             <param name="errors">Detected errors</param>
             <returns>True if no error</returns>
         </member>
@@ -7242,11 +7385,29 @@
             <param name="errors">Detected errors</param>
             <returns>True if no error</returns>
         </member>
+        <member name="M:NBitcoin.TransactionBuilder.Verify(NBitcoin.TransactionValidator,NBitcoin.Money,NBitcoin.Policy.TransactionPolicyError[]@)">
+            <summary>
+            Verify that a transaction is fully signed, have enough fees, and follow the Standard and Miner Transaction Policy rules
+            </summary>
+            <param name="validator">The transaction validator</param>
+            <param name="expectedFees">The expected fees (more or less 10%)</param>
+            <param name="errors">Detected errors</param>
+            <returns>True if no error</returns>
+        </member>
         <member name="M:NBitcoin.TransactionBuilder.Verify(NBitcoin.Transaction,NBitcoin.FeeRate,NBitcoin.Policy.TransactionPolicyError[]@)">
             <summary>
             Verify that a transaction is fully signed and have enough fees
             </summary>
             <param name="tx">The transaction to check</param>
+            <param name="expectedFeeRate">The expected fee rate</param>
+            <param name="errors">Detected errors</param>
+            <returns>True if no error</returns>
+        </member>
+        <member name="M:NBitcoin.TransactionBuilder.Verify(NBitcoin.TransactionValidator,NBitcoin.FeeRate,NBitcoin.Policy.TransactionPolicyError[]@)">
+            <summary>
+            Verify that a transaction is fully signed and have enough fees
+            </summary>
+            <param name="validator">The transaction validator</param>
             <param name="expectedFeeRate">The expected fee rate</param>
             <param name="errors">Detected errors</param>
             <returns>True if no error</returns>
@@ -7329,26 +7490,6 @@
         <member name="M:NBitcoin.TransactionBuilder.Then(System.String)">
             <summary>
             Switch to another participant in the transaction, or create a new one if it is not found.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.TransactionBuilder.CoverOnly(NBitcoin.Money)">
-            <summary>
-            Specify the amount of money to cover txouts, if not specified all txout will be covered
-            </summary>
-            <param name="amount"></param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.TransactionBuilder.ContinueToBuild(NBitcoin.Transaction)">
-            <summary>
-            Allows to keep building on the top of a partially built transaction
-            </summary>
-            <param name="transaction">Transaction to complete</param>
-            <returns></returns>
-        </member>
-        <member name="M:NBitcoin.TransactionBuilder.CoverTheRest">
-            <summary>
-            Will cover the remaining amount of TxOut of a partially built transaction (to call after ContinueToBuild)
             </summary>
             <returns></returns>
         </member>
@@ -7442,6 +7583,15 @@
             </summary>
             <param name="item"></param>
             <returns>When disposed, the item is removed</returns>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.#ctor(System.String)">
+            <summary>Initializes the attribute with the associated parameter name.</summary>
+            <param name="parameterName">
+            The associated parameter name.  The output will be non-null if the argument to the parameter specified is non-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.ParameterName">
+            <summary>Gets the associated parameter name.</summary>
         </member>
     </members>
 </doc>

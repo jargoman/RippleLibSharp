@@ -31,6 +31,7 @@ using Ripple.TxSigning;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using RippleLibSharp.Mnemonics;
+using RippleLibSharp.UnitTesting;
 
 namespace Source.UnitTesting
 {
@@ -40,6 +41,7 @@ namespace Source.UnitTesting
 		{
 			this.NetworkInterfaceObj = ni;
 		}
+
 		NetworkInterface NetworkInterfaceObj {
 			get;
 			set;
@@ -53,7 +55,7 @@ namespace Source.UnitTesting
 			System.Console.WriteLine ("testing 1,2,3");
 
 
-			TestMnemonic ();
+			//TestMnemonic ();
 
 		
 			//System.Console.WriteLine (RippleAddress.RIPPLE_ADDRESS_ICE_ISSUER);
@@ -173,8 +175,10 @@ namespace Source.UnitTesting
 
 		}
 
-		public static void TestMnemonic ()
+		public static TestResult TestMnemonic ()
 		{
+
+
 
 			var wrds = new List<string> () {
 				"piano",
@@ -200,7 +204,7 @@ namespace Source.UnitTesting
 			if (!valid.IsValid) {
 				Console.WriteLine ("Not valid : ");
 				Console.WriteLine (valid.Message);
-				return;
+				return new TestResult(false);
 			} else {
 				Console.WriteLine (valid.Message);
 			}
@@ -218,22 +222,29 @@ namespace Source.UnitTesting
 			var accounts = nm.GetAccounts (accs);
 
 
+            // Todo compare test case
 			foreach (var a in accounts) {
 				Console.WriteLine (a.AsHex ());
 			}
+
+            return new TestResult(true);
 
 		}
 
 		public static NetworkInterface TestNetworking ()
 		{
 
-			ConnectionSettings connectInfo = new ConnectionSettings {
+			ConnectionSettings connectInfo = new ConnectionSettings
+            {
 
-				ServerUrls = new string[] { "wss://s1.ripple.com:443", "wss://s2.ripple.com:443" },
-				//ServerUrls = new string [] { "wss://s.altnet.rippletest.net:51233" },
+                ServerUrls = new string[] { "wss://s1.ripple.com:443", "wss://s2.ripple.com:443" },
+                //ServerUrls = new string[] { "wss://s.altnet.rippletest.net:51233" },
 
-				//ServerUrls = new string[] { "wss://127.0.0.1:6006" };
-				LocalUrl = "localhost",
+                //ServerUrls = new string[] { "wss://ripple.cybersecurity-research-lab.ryerson.ca" },
+            
+
+                //ServerUrls = new string[] { "wss://127.0.0.1:6006" },
+                LocalUrl = "localhost",
 				UserAgent = "optional spoof browser user agent",
 				Reconnect = true
 			};
@@ -244,6 +255,23 @@ namespace Source.UnitTesting
 
 			//NetworkRequestTask.initNetworkTasking ();
 
+            ni.OnError += (object o, IhildaWebSocketError e) => {
+
+                Exception outer = e.Exception;
+
+
+                while (outer != null) {
+                    Console.WriteLine("Network error : ");
+                    Console.WriteLine(outer.Message);
+
+                    outer = outer.InnerException;
+                }
+                    
+                
+
+            };
+
+
 			Task<bool> connectTask = ni.ConnectTask ();
 
 			connectTask.Wait ();
@@ -252,6 +280,7 @@ namespace Source.UnitTesting
 
 			//Logging.writeLog ();
 			System.Console.WriteLine ("connected == " + res.ToString ());
+
 			return ni;
 		}
 

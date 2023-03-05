@@ -63,7 +63,7 @@ namespace RippleLibSharp.Mnemonics
 			case 21:
 			case 24:
 				try {
-					RandomUtils.Random = new UnsecureRandom ();
+					RandomUtils.Random = new UnsecureRandom (); // why do I need this???
 
 					Mnemonic mnemonic = new Mnemonic (string.Join (" ", words));
 
@@ -149,7 +149,9 @@ namespace RippleLibSharp.Mnemonics
 
 				byte [] seed = mnemonic.DeriveSeed ();
 
-				BIP39_SEED = new ExtKey (seed);
+				BIP39_SEED = new ExtKey (RippleLibSharp.Binary.Base58.ByteArrayToHexString(seed));
+
+                //BIP39_SEED = new ExtKey(
 
 				Account_Extended_Private_key = BIP39_SEED.Derive (keyPathToDerive);
 

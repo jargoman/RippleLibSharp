@@ -762,7 +762,7 @@ namespace RippleLibSharp.Network
 
 			try {
 
-				websocket = new WebSocket4Net.WebSocket (attemptInfo.ServerUrl);
+				websocket = new WebSocket4Net.WebSocket (attemptInfo.ServerUrl, sslProtocols: System.Security.Authentication.SslProtocols.Tls12);
 
 				/*
 				this.websocket = new WebSocket4Net.WebSocket (
